@@ -1,54 +1,38 @@
-const {
-  MYSQLDB_HOST = "localhost",
-  MYSQLDB_USER = "root",
-  MYSQLDB_PASSWORD = "",
-  MYSQLDB_ROOT_PASSWORD = "root",
-  MYSQLDB_DATABASE = "",
-  MYSQLDB_LOCAL_PORT = "3306",
-  MYSQLDB_DOCKER_PORT = "3306",
-  JWT_SECRET = "",
-  MAIL_PASSWORD = "",
-  MAIL_USERNAME = "",
-  MAIL_PORT = "2525",
-  MAIL_HOST = "smtp.mailtrap.io",
-  NODE_LOCAL_PORT = "3000",
-  NODE_DOCKER_PORT = "3000",
+import * as dotenv from "dotenv";
+dotenv.config();
 
-  PORT = "3000",
-  DOMAIN = "http://localhost:3000/api/v1",
-} = process.env;
-
-const requiredVars = [JWT_SECRET, MAIL_PASSWORD, MAIL_USERNAME];
-requiredVars.forEach((varName) => {
-  if (!varName) {
-    throw new Error(`Falta la variable de entorno: ${varName}`);
+const getEnv = (key: string, defaultValue?: string): string => {
+  const value = process.env[key] ?? defaultValue;
+  if (value === undefined) {
+    throw new Error(`Falta la variable de entorno obligatoria: ${key}`);
   }
-});
+  return value;
+};
 
 export const envConfig = {
   // Base de Datos
-  MYSQLDB_HOST,
-  MYSQLDB_USER,
-  MYSQLDB_PASSWORD,
-  MYSQLDB_ROOT_PASSWORD,
-  MYSQLDB_DATABASE,
-  MYSQLDB_LOCAL_PORT: Number(MYSQLDB_LOCAL_PORT),
-  MYSQLDB_DOCKER_PORT: Number(MYSQLDB_DOCKER_PORT),
+  MYSQLDB_HOST: getEnv("MYSQLDB_HOST", "localhost"),
+  MYSQLDB_USER: getEnv("MYSQLDB_USER", "root"),
+  MYSQLDB_PASSWORD: getEnv("MYSQLDB_PASSWORD", ""),
+  MYSQLDB_ROOT_PASSWORD: getEnv("MYSQLDB_ROOT_PASSWORD", "root"),
+  MYSQLDB_DATABASE: getEnv("MYSQLDB_DATABASE", ""),
+  MYSQLDB_LOCAL_PORT: Number(getEnv("MYSQLDB_LOCAL_PORT", "3306")),
+  MYSQLDB_DOCKER_PORT: Number(getEnv("MYSQLDB_DOCKER_PORT", "3306")),
 
   // JWT
-  JWT_SECRET,
+  JWT_SECRET: getEnv("JWT_SECRET"),
 
   // MailTrap
-  MAIL_PASSWORD,
-  MAIL_USERNAME,
-  MAIL_PORT: Number(MAIL_PORT),
-  MAIL_HOST,
+  MAIL_PASSWORD: getEnv("MAIL_PASSWORD"),
+  MAIL_USERNAME: getEnv("MAIL_USERNAME"),
+  MAIL_PORT: Number(getEnv("MAIL_PORT", "2525")),
+  MAIL_HOST: getEnv("MAIL_HOST", "smtp.mailtrap.io"),
 
   // Node.js
-  NODE_LOCAL_PORT: Number(NODE_LOCAL_PORT),
-  NODE_DOCKER_PORT: Number(NODE_DOCKER_PORT),
+  NODE_LOCAL_PORT: Number(getEnv("NODE_LOCAL_PORT", "3000")),
+  NODE_DOCKER_PORT: Number(getEnv("NODE_DOCKER_PORT", "3000")),
 
-  // URL de la aplicación
-  PORT: Number(PORT),
-  DOMAIN,
+  // App
+  PORT: Number(getEnv("PORT", "3000")),
+  DOMAIN: getEnv("DOMAIN", "http://localhost:3000/api/v1"),
 };
