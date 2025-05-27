@@ -1,0 +1,9 @@
+npm init -y
+npx tsc --init --outDir dist/ --rootDir src
+npm i -D typescript @types/node ts-node-dev rimraf
+
+npx prisma migrate dev --name init
+npx prisma migrate reset
+
+
+$ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag

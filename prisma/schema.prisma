@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Plan {
+  id              String     @unique @default(uuid())
+  name            String
+  maxFarms        Int
+  maxUsersPerFarm Int
+  price           Decimal    @db.Decimal(10, 3)
+  userPlan        UserPlan[]
+}
+
+model User {
+  id                String     @unique @default(uuid())
+  //name              String     @unique
+  email             String     @unique
+  password          String
+  isOwner           Boolean
+  validated         Boolean
+  verificationToken String
+  createdAt         DateTime
+  updatedAt         DateTime
+  state             Boolean
+  userPlan          UserPlan?
+  farms              Farm[]
+  farmUsers         FarmUser[]
+}
+
+model UserPlan {
+  id     String @unique @default(uuid())
+  userId String @unique
+  planId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+model FarmUser {
+  id     String @unique @default(uuid())
+  farmId String
+  userId String
+  farm   Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          String   @unique @default(uuid())
+  title       String
+  description String   @db.LongText
+  data        String
+  dateSent    DateTime
+  isRead      Boolean
+  farmId      String
+  farm        Farm     @relation(fields: [farmId], references: [id])
+}
+
+model Farm {
+  id                 String              @unique @default(uuid())
+  name               String
+  ownerId            String
+  owner              User                @relation(fields: [ownerId], references: [id])
+  createdAt          DateTime
+  updatedAt          DateTime
+  breeds             Breed[]
+  farmUsers          FarmUser[]
+  reproductiveStates ReproductiveState[]
+  phases             Phase[]
+
+  categories    Category[]
+  products      Product[]
+  pigs          Pig[]
+  notifications Notification[]
+  Setting       Setting[]
+}
+
+model Breed {
+  id        String   @unique @default(uuid())
+  name      String
+  farmId    String
+  farm      Farm     @relation(fields: [farmId], references: [id])
+  createdAt DateTime
+  updatedAt DateTime
+  pigs      Pig[]
+}
+
+model ReproductiveState {
+  id                  String                @unique @default(uuid())
+  name                String
+  farmId              String
+  farm                Farm                  @relation(fields: [farmId], references: [id])
+  createdAt           DateTime
+  updatedAt           DateTime
+  reproductiveHistory ReproductiveHistory[]
+}
+
+model Phase {
+  id        String   @unique @default(uuid())
+  name      String
+  farmId    String
+  farm      Farm     @relation(fields: [farmId], references: [id])
+  createdAt DateTime
+  updatedAt DateTime
+  pigs      Pig[]
+}
+
+model Category {
+  id        String    @unique @default(uuid())
+  name      String
+  farmId    String
+  farm      Farm      @relation(fields: [farmId], references: [id])
+  createdAt DateTime
+  updatedAt DateTime
+  products  Product[]
+}
+
+model Product {
+  id          String       @unique @default(uuid())
+  name        String
+  description String?      @db.LongText
+  price       Decimal      @db.Decimal(10, 3)
+  farmId      String
+  categoryId  String
+  farm        Farm         @relation(fields: [farmId], references: [id])
+  category    Category     @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime
+  updatedAt   DateTime
+  pigs        PigProduct[]
+}
+
+enum PigSex {
+  Macho
+  Hembra
+}
+
+enum PigState {
+  Activo
+  Vendido
+  Muerto
+}
+
+enum PigType {
+  Producción
+  Reproducción
+}
+
+model Pig {
+  id      String @unique @default(uuid())
+  farmId  String
+  breedId String
+  phaseId String
+
+  type PigType
+  sex  PigSex
+
+  code          String
+  ageDays       Int
+  initialPrice  Decimal  @db.Decimal(10, 3)
+  investedPrice Decimal  @db.Decimal(10, 3)
+  state         PigState
+
+  createdAt DateTime
+  updatedAt DateTime
+
+  birthId  String?
+  motherId String?
+  fatherId String?
+
+  farm  Farm  @relation(fields: [farmId], references: [id])
+  breed Breed @relation(fields: [breedId], references: [id])
+  phase Phase @relation(fields: [phaseId], references: [id])
+
+  weights  PigWeight[]
+  products PigProduct[]
+
+  mother            Pig?   @relation("MotherPig", fields: [motherId], references: [id])
+  father            Pig?   @relation("FatherPig", fields: [fatherId], references: [id])
+  pigletsFromMother Pig[]  @relation("MotherPig")
+  pigletsFromFather Pig[]  @relation("FatherPig")
+  birth             Birth? @relation("BirthPiglets", fields: [birthId], references: [id])
+
+  sowReproductiveHistory  ReproductiveHistory[] @relation("SowPig")
+  boarReproductiveHistory ReproductiveHistory[] @relation("BoarPig")
+}
+
+model ReproductiveHistory {
+  id                  String   @unique @default(uuid())
+  reproductiveStateId String
+  sowId               String
+  boarId              String?
+  sequential          Int
+  startDate           DateTime
+  endDate             DateTime
+
+  sow               Pig               @relation("SowPig", fields: [sowId], references: [id], onDelete: Cascade)
+  boar              Pig?              @relation("BoarPig", fields: [boarId], references: [id], onDelete: Cascade)
+  reproductiveState ReproductiveState @relation(fields: [reproductiveStateId], references: [id], onDelete: Cascade)
+  births            Birth[]
+}
+
+model Birth {
+  id                    String   @unique @default(uuid())
+  reproductiveHistoryId String
+  numberBirth           Int
+  birthDate             DateTime
+  malePiglets           Int
+  femalePiglets         Int
+  deadPiglets           Int
+  averageLitterWeight   Decimal  @db.Decimal(10, 3)
+  isLitterWeaned        Boolean  @default(false)
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  piglets             Pig[]               @relation("BirthPiglets")
+  reproductiveHistory ReproductiveHistory @relation(fields: [reproductiveHistoryId], references: [id], onDelete: Cascade)
+}
+
+model PigWeight {
+  id        String   @unique @default(uuid())
+  pigId     String
+  days      Int
+  weight    Decimal  @db.Decimal(10, 3)
+  createdAt DateTime
+  updatedAt DateTime
+
+  pig Pig @relation(fields: [pigId], references: [id], onDelete: Cascade)
+}
+
+model PigProduct {
+  id        String  @unique @default(uuid())
+  pigId     String
+  productId String
+  quantity  Decimal @db.Decimal(10, 3)
+
+  createdAt DateTime
+  updatedAt DateTime
+
+  product Product @relation(fields: [productId], references: [id])
+  pig     Pig     @relation(fields: [pigId], references: [id])
+}
+
+model Setting {
+  id                       String  @id @default(uuid())
+  farmId                   String
+  matingHeatDurationDays   Int // Duración en días del estado de celo
+  inseminationDurationDays Int // Duración en días del estado de inseminación
+  gestationDurationDays    Int // Duración en días del estado de gestación
+  lactationDurationDays    Int // Duración en días del estado de lactancia
+  weaningDurationDays      Int // Duración en días del estado de destete
+  restingDurationDays      Int // Duración en días del estado de descanso
+  initialPigletPrice       Decimal @db.Decimal(10, 3)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  farm      Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}

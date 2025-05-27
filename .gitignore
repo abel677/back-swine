@@ -1,0 +1,7 @@
+.env
+node_modules
+dist/
+build/
+script_plans
+docker-compose.yml
+Dockerfile
