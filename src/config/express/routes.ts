@@ -40,6 +40,10 @@ export class AppRoutes {
     router.use(`${apiPrefix}/farm`, this.farmRoutes());
     router.use(`${apiPrefix}/auth`, this.authRoutes());
 
+    router.use("/", (req, res) => {
+      res.send("API REST SWINE MANAGEMENT");
+    });
+
     return router;
   }
 

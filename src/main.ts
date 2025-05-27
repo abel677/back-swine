@@ -4,9 +4,7 @@ import { AppRoutes } from "./config/express/routes";
 import { Server } from "./config/express/server";
 import { dependencyInjection } from "./config/express/dependency-injection";
 
-const { PORT, DATABASE_URL } = envConfig;
-
-console.log(DATABASE_URL);
+const { PORT } = envConfig;
 
 (() => {
   main();
