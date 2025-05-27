@@ -28,6 +28,9 @@ export class AppRoutes {
     const router = Router();
     const apiPrefix = "/api/v1";
 
+    router.get(`${apiPrefix}/`, (_, res) => {
+      res.status(200).json({ message: "API porcina activa 🚀" });
+    });
     router.use(`${apiPrefix}/pig`, this.pigRoutes());
     router.use(`${apiPrefix}/product`, this.productsRoutes());
     router.use(`${apiPrefix}/category`, this.categoriesRoutes());
@@ -39,10 +42,6 @@ export class AppRoutes {
     router.use(`${apiPrefix}/breed`, this.breedRoutes());
     router.use(`${apiPrefix}/farm`, this.farmRoutes());
     router.use(`${apiPrefix}/auth`, this.authRoutes());
-
-    router.use("/", (req, res) => {
-      res.send("API REST SWINE MANAGEMENT");
-    });
 
     return router;
   }
