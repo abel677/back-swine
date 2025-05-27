@@ -35,4 +35,5 @@ export const envConfig = {
   // App
   PORT: Number(getEnv("PORT", "3000")),
   DOMAIN: getEnv("DOMAIN", "http://localhost:3000/api/v1"),
+  NODE_ENV: getEnv("NODE_ENV"),
 };

@@ -4,21 +4,22 @@ import { AppRoutes } from "./config/express/routes";
 import { Server } from "./config/express/server";
 import { dependencyInjection } from "./config/express/dependency-injection";
 
-const { PORT } = envConfig;
+const { PORT, NODE_ENV } = envConfig;
 
 (() => {
   main();
 })();
 
 async function main() {
-  await PrismaConnection.connect();
+  if (NODE_ENV !== "dev") {
+    await PrismaConnection.connect();
+    const appRoutes = new AppRoutes(dependencyInjection.controllers);
 
-  const appRoutes = new AppRoutes(dependencyInjection.controllers);
+    const server = new Server({
+      port: PORT,
+      routes: appRoutes.routes,
+    });
 
-  const server = new Server({
-    port: PORT,
-    routes: appRoutes.routes,
-  });
-
-  await server.start();
+    await server.start();
+  }
 }
