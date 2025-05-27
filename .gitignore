@@ -5,3 +5,4 @@ build/
 script_plans
 docker-compose.yml
 Dockerfile
+.dockerignore

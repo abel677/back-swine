@@ -11,18 +11,13 @@ export class CreateUserUseCase {
     password: string;
     isOwner: boolean;
   }) {
-    const alreadyExistByName = await this.userRepository.getByName(dto.name);
-    if (alreadyExistByName) {
-      throw ApiError.badRequest("Nombre de usuario no disponible.");
-    }
     const alreadyExist = await this.userRepository.getByEmail(dto.email);
     if (alreadyExist) {
       throw ApiError.badRequest("No se pudo crear el usuario.");
     }
 
     const user = User.create({
-      name: dto.name,
-      email: dto.email,
+        email: dto.email,
       isOwner: dto.isOwner,
       password: dto.password,
     });
