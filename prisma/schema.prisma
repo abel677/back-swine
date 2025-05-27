@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL_PROD")
+  url      = env("DATABASE_URL")
 }
 
 model Plan {
@@ -28,7 +28,7 @@ model User {
   updatedAt         DateTime
   state             Boolean
   userPlan          UserPlan?
-  farms              Farm[]
+  farms             Farm[]
   farmUsers         FarmUser[]
 }
 
