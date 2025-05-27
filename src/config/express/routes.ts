@@ -28,9 +28,6 @@ export class AppRoutes {
     const router = Router();
     const apiPrefix = "/api/v1";
 
-    router.get(`${apiPrefix}/`, (_, res) => {
-      res.status(200).json({ message: "API porcina activa 🚀" });
-    });
     router.use(`${apiPrefix}/pig`, this.pigRoutes());
     router.use(`${apiPrefix}/product`, this.productsRoutes());
     router.use(`${apiPrefix}/category`, this.categoriesRoutes());
