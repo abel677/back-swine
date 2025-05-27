@@ -1,3 +1,7 @@
+
+import * as dotenv from "dotenv";
+dotenv.config();
+
 const {
   MYSQLDB_HOST = "localhost",
   MYSQLDB_USER = "root",
