@@ -4,7 +4,6 @@ import { UserPlan } from "./user-plan.entity";
 export class User {
   private constructor(
     private readonly _id: string,
-    //private readonly _name: string,
     private readonly _email: string,
     private readonly _password: string,
     private readonly _isOwner: boolean,
@@ -16,18 +15,12 @@ export class User {
     private readonly _userPlan: UserPlan | null
   ) {}
 
-  static create(props: {
-    //name: string;
-    email: string;
-    password: string;
-    isOwner: boolean;
-  }) {
+  static create(props: { email: string; password: string; isOwner: boolean }) {
     const id = crypto.randomUUID();
     const currentDate = DomainDateTime.now();
 
     return new User(
       id,
-      //props.name,
       props.email,
       props.password,
       props.isOwner,
@@ -41,7 +34,6 @@ export class User {
   }
   static fromPrimitives(props: {
     id: string;
-    //name: string;
     email: string;
     password: string;
     isOwner: boolean;
@@ -54,7 +46,6 @@ export class User {
   }): User {
     return new User(
       props.id,
-      //props.name,
       props.email,
       props.password,
       props.isOwner,
@@ -67,14 +58,9 @@ export class User {
     );
   }
 
-  // Getters
   get id(): string {
     return this._id;
   }
-
-  // get name(): string {
-  //   return this._name;
-  // }
 
   get email(): string {
     return this._email;

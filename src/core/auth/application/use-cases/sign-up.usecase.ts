@@ -29,12 +29,6 @@ export class SignUpUseCase {
       throw ApiError.notFound("Ocurrió un error, comuniquese con soporte.");
     }
 
-    // const alreadyExistByName = await this.userRepository.getByName(dto.name);
-
-    // if (alreadyExistByName) {
-    //   throw ApiError.badRequest("Nombre de usuario no disponible.");
-    // }
-
     const alreadyExist = await this.userRepository.getByEmail(dto.email);
     if (alreadyExist) {
       throw ApiError.badRequest(
@@ -44,7 +38,6 @@ export class SignUpUseCase {
 
     const passwordHashed = await this.hashService.hash(dto.password);
     const user = User.create({
-      //name: dto.name,
       email: dto.email,
       isOwner: true,
       password: passwordHashed,
