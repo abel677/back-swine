@@ -26,6 +26,7 @@ export class AppRoutes {
 
   get routes(): Router {
     const router = Router();
+
     const apiPrefix = "/api/v1";
 
     router.use(`${apiPrefix}/pig`, this.pigRoutes());
@@ -40,6 +41,9 @@ export class AppRoutes {
     router.use(`${apiPrefix}/farm`, this.farmRoutes());
     router.use(`${apiPrefix}/auth`, this.authRoutes());
 
+    router.use("/", (req, res) => {
+      return res.send("WELCOME API SWINE MANAGEMENT");
+    });
     return router;
   }
 
