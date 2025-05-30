@@ -131,38 +131,6 @@ export class CreatePigDto {
       return ["boarId: ID cerdo reproductor inválido."];
     }
 
-    // if (
-    //   body.numberMalePiglets !== undefined &&
-    //   (typeof body.numberMalePiglets !== "number" || body.numberMalePiglets < 0)
-    // ) {
-    //   return ["numberMalePiglets: Número de lechones machos vivos inválido."];
-    // }
-
-    // if (
-    //   body.numberFemalePiglets !== undefined &&
-    //   (typeof body.numberFemalePiglets !== "number" ||
-    //     body.numberFemalePiglets < 0)
-    // ) {
-    //   return [
-    //     "numberFemalePiglets: Número de lechones hembras vivas inválido.",
-    //   ];
-    // }
-
-    // if (
-    //   body.numberDeadPiglets !== undefined &&
-    //   (typeof body.numberDeadPiglets !== "number" || body.numberDeadPiglets < 0)
-    // ) {
-    //   return ["numberDeadPiglets: Número de lechones muertos inválido."];
-    // }
-
-    // if (
-    //   body.averageLiterWeight !== undefined &&
-    //   (typeof body.averageLiterWeight !== "number" ||
-    //     body.averageLiterWeight < 0)
-    // ) {
-    //   return ["averageLiterWeight: Peso promedio de la camada inválido."];
-    // }
-
     return [
       null,
       new CreatePigDto(

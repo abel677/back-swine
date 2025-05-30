@@ -41,9 +41,9 @@ export class AppRoutes {
     router.use(`${apiPrefix}/farm`, this.farmRoutes());
     router.use(`${apiPrefix}/auth`, this.authRoutes());
 
-    router.use("/", (req, res) => {
-      return res.send("WELCOME API SWINE MANAGEMENT");
-    });
+    // router.use("/", (req, res) => {
+    //   return res.send("WELCOME API SWINE MANAGEMENT");
+    // });
     return router;
   }
 
@@ -54,6 +54,12 @@ export class AppRoutes {
       "/add-weight/:id",
       [AuthMiddleware.validateJWT],
       asyncHandler(this.deps.pigCtrl.createPigWight)
+    );
+
+    router.put(
+      "/:id",
+      [AuthMiddleware.validateJWT],
+      asyncHandler(this.deps.pigCtrl.update)
     );
 
     router.get(

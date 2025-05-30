@@ -1,10 +1,11 @@
+import { Farm } from "../../../farms/domain/entities/farm.entity";
 import { DomainDateTime } from "../../../shared/domain-datetime";
 import { Category } from "./category.entity";
 
 export class Product {
   private constructor(
     public readonly id: string,
-    public readonly farmId: string,
+    private _farm: Farm,
     private _category: Category,
     private _name: string,
     private _description: string,
@@ -14,7 +15,7 @@ export class Product {
   ) {}
 
   static create(props: {
-    farmId: string;
+    farm: Farm;
     category: Category;
     name: string;
     description: string;
@@ -25,7 +26,7 @@ export class Product {
 
     return new Product(
       id,
-      props.farmId,
+      props.farm,
       props.category,
       props.name,
       props.description,
@@ -37,7 +38,7 @@ export class Product {
 
   static fromPrimitives(props: {
     id: string;
-    farmId: string;
+    farm: Farm;
     category: Category;
     name: string;
     description: string;
@@ -47,7 +48,7 @@ export class Product {
   }) {
     return new Product(
       props.id,
-      props.farmId,
+      props.farm,
       props.category,
       props.name,
       props.description,
@@ -62,6 +63,7 @@ export class Product {
     description?: string;
     price?: number;
     category?: Category;
+    farm?: Farm;
   }) {
     if (props.name !== undefined) {
       this._name = props.name;
@@ -74,6 +76,9 @@ export class Product {
     }
     if (props.category !== undefined) {
       this._category = props.category;
+    }
+    if (props.farm !== undefined) {
+      this._farm = props.farm;
     }
     this._updatedAt = DomainDateTime.now();
   }
@@ -96,5 +101,9 @@ export class Product {
 
   get category() {
     return this._category;
+  }
+
+  get farm() {
+    return this._farm;
   }
 }

@@ -29,6 +29,7 @@ import { CreatePigWeightUseCase } from "../../core/pigs/application/use-cases/cr
 import { CreatePigUseCase } from "../../core/pigs/application/use-cases/create-pig.usecase";
 import { GetAllPigUseCase } from "../../core/pigs/application/use-cases/get-all-pig.usecase";
 import { PigReproductiveCalculatorUseCase } from "../../core/pigs/application/use-cases/pig-reproductive-calculator.usecase";
+import { UpdatePigUseCase } from "../../core/pigs/application/use-cases/update-pig.usecase";
 import { PrismaBirthRepository } from "../../core/pigs/infrastructure/persistence/prisma-birth.repository";
 import { PrismaPigRepository } from "../../core/pigs/infrastructure/persistence/prisma-pig.repository.ts";
 import { PrismaReproductiveHistory } from "../../core/pigs/infrastructure/persistence/prisma-reproductive-history.repository";
@@ -149,18 +150,23 @@ const phaseUseCases = {
   getAll: new GetAllPhaseUseCase(repositories.phaseRepository),
 };
 const categoryUseCases = {
-  create: new CreateCategoryUseCase(repositories.categoryRepository),
+  create: new CreateCategoryUseCase(
+    repositories.categoryRepository,
+    repositories.farmRepository
+  ),
   update: new UpdateCategoryUseCase(repositories.categoryRepository),
   getAll: new GetAllCategoryUseCase(repositories.categoryRepository),
 };
 const productUseCases = {
   create: new CreateProductUseCase(
     repositories.productRepository,
-    repositories.categoryRepository
+    repositories.categoryRepository,
+    repositories.farmRepository
   ),
   update: new UpdateProductUseCase(
     repositories.productRepository,
-    repositories.categoryRepository
+    repositories.categoryRepository,
+    repositories.farmRepository
   ),
   getAll: new GetAllProductUseCase(repositories.productRepository),
 };
@@ -175,6 +181,12 @@ const pigUseCases = {
     pigReproductiveCalculatorUseCase,
     notificationUseCases.createSowNotifications,
     repositories.settingRepository
+  ),
+  update: new UpdatePigUseCase(
+    repositories.farmRepository,
+    repositories.breedRepository,
+    repositories.phaseRepository,
+    repositories.pigRepository
   ),
   getAll: new GetAllPigUseCase(repositories.pigRepository),
   createWeight: new CreatePigWeightUseCase(repositories.pigRepository),
@@ -216,7 +228,8 @@ const controllers = {
   pigCtrl: new PigController(
     pigUseCases.create,
     pigUseCases.getAll,
-    pigUseCases.createWeight
+    pigUseCases.createWeight,
+    pigUseCases.update
   ),
 };
 

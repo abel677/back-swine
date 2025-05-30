@@ -37,6 +37,7 @@ export class PrismaProductRepository implements ProductRepository {
       },
       include: {
         category: true,
+        farm: true,
       },
       orderBy: {
         updatedAt: "desc",
@@ -63,6 +64,7 @@ export class PrismaProductRepository implements ProductRepository {
       },
       include: {
         category: true,
+        farm: true,
       },
     });
     if (!entity) return null;
@@ -87,6 +89,24 @@ export class PrismaProductRepository implements ProductRepository {
       },
       include: {
         category: true,
+        farm: true,
+      },
+    });
+    if (!entity) return null;
+    return ProductMapper.toDomain(entity);
+  }
+  async getByIdAndFarmId(params: {
+    id: string;
+    farmId: string;
+  }): Promise<Product | null> {
+    const entity = await this.prisma.product.findFirst({
+      where: {
+        id: params.id,
+        farmId: params.farmId,
+      },
+      include: {
+        category: true,
+        farm: true,
       },
     });
     if (!entity) return null;
@@ -98,6 +118,7 @@ export class PrismaProductRepository implements ProductRepository {
       where: { name },
       include: {
         category: true,
+        farm: true,
       },
     });
     if (!entity) return null;
@@ -109,6 +130,7 @@ export class PrismaProductRepository implements ProductRepository {
       where: { id },
       include: {
         category: true,
+        farm: true,
       },
     });
     if (!entity) return null;

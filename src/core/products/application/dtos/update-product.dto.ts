@@ -2,6 +2,7 @@ import { Validators } from "../../../shared/utils/Validators";
 
 export class UpdateProductDto {
   private constructor(
+    public farmId?: string,
     public name?: string,
     public price?: number,
     public description?: string,
@@ -9,6 +10,11 @@ export class UpdateProductDto {
   ) {}
 
   static create(body: { [key: string]: any }): [string?, UpdateProductDto?] {
+    if (body.farmId !== undefined) {
+      if (!Validators.isValidUUID(body.farmId)) {
+        return ["farmId: ID de granja inválido o faltante."];
+      }
+    }
     if (body.name !== undefined) {
       if (typeof body.name !== "string" || body.name.trim().length === 0) {
         return ["name: Nombre de producto inválido."];
@@ -38,6 +44,7 @@ export class UpdateProductDto {
     return [
       null,
       new UpdateProductDto(
+        body.farmId,
         body.name?.trim(),
         body.price,
         body.description?.trim(),

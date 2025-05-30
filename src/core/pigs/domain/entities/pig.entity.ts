@@ -113,8 +113,20 @@ export class Pig {
     this.props.sowReproductiveHistory.unshift(history);
   }
 
+  updateInitialPrice(initialPrice: number) {
+    this.props.initialPrice = initialPrice;
+  }
+  updateCode(code: string) {
+    this.props.code = code;
+  }
+
   updatePhase(newPhase: Phase) {
     this.props.phase = newPhase;
+    this.updateTimestamp();
+  }
+
+  updateFarm(farm: Farm) {
+    this.props.farm = farm;
     this.updateTimestamp();
   }
 

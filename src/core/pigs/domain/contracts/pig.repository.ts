@@ -15,6 +15,7 @@ export interface PigRepository {
   }): Promise<Pig | null>;
 
   getByIdAndFarmId(params: { id: string; farmId: string }): Promise<Pig | null>;
+  getByIdAndUserId(params: { id: string; userId: string }): Promise<Pig | null>;
 
   getByCode(code: string): Promise<Pig | null>;
   getById(id: string): Promise<Pig | null>;

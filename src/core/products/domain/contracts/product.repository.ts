@@ -13,6 +13,10 @@ export interface ProductRepository {
     id: string;
     userId: string;
   }): Promise<Product | null>;
+  getByIdAndFarmId(params: {
+    id: string;
+    farmId: string;
+  }): Promise<Product | null>;
   getByName(name: string): Promise<Product | null>;
   getById(id: string): Promise<Product | null>;
 }

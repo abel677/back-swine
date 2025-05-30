@@ -68,6 +68,9 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
     return entities.map((entity) => PigMapper.fromPersistenceToDomain(entity));
   }
@@ -109,6 +112,9 @@ export class PrismaPigRepository implements PigRepository {
           },
         },
         weights: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
     });
     return entities.map((entity) => PigMapper.fromPersistenceToDomain(entity));
@@ -158,7 +164,6 @@ export class PrismaPigRepository implements PigRepository {
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
   }
-
   async getByIdAndFarmId(params: { id: string; farmId: string }): Promise<Pig> {
     const entity = await this.prisma.pig.findFirst({
       where: { id: params.id, farmId: params.farmId },
@@ -200,7 +205,55 @@ export class PrismaPigRepository implements PigRepository {
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
   }
-
+  async getByIdAndUserId(params: { id: string; userId: string }): Promise<Pig> {
+    const entity = await this.prisma.pig.findFirst({
+      where: {
+        id: params.id,
+        farm: {
+          OR: [
+            { ownerId: params.userId },
+            { farmUsers: { some: { userId: params.userId } } },
+          ],
+        },
+      },
+      include: {
+        farm: true,
+        breed: true,
+        phase: true,
+        birth: true,
+        sowReproductiveHistory: {
+          include: {
+            reproductiveState: true,
+            boar: true,
+            sow: true,
+            births: {
+              include: {
+                piglets: {
+                  include: {
+                    farm: true,
+                    phase: true,
+                    breed: true,
+                    birth: true,
+                    mother: true,
+                    father: true,
+                  },
+                },
+                reproductiveHistory: true,
+              },
+              orderBy: {
+                birthDate: "desc",
+              },
+            },
+          },
+          orderBy: {
+            startDate: "desc",
+          },
+        },
+        weights: true,
+      },
+    });
+    return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
+  }
   async getByCode(code: string): Promise<Pig> {
     const entity = await this.prisma.pig.findFirst({
       where: { code: code },
@@ -242,7 +295,6 @@ export class PrismaPigRepository implements PigRepository {
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
   }
-
   async getById(id: string): Promise<Pig> {
     const entity = await this.prisma.pig.findFirst({
       where: { id: id },

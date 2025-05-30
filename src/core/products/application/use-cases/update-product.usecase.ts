@@ -1,3 +1,5 @@
+import { FarmRepository } from "../../../farms/domain/contracts/farm.repository";
+import { Farm } from "../../../farms/domain/entities/farm.entity";
 import { ApiError } from "../../../shared/exceptions/custom-error";
 import { CategoryRepository } from "../../domain/contracts/category.repository";
 import { ProductRepository } from "../../domain/contracts/product.repository";
@@ -7,10 +9,12 @@ import { UpdateProductDto } from "../dtos/update-product.dto";
 export class UpdateProductUseCase {
   constructor(
     private readonly productRepository: ProductRepository,
-    private readonly categoryRepository: CategoryRepository
+    private readonly categoryRepository: CategoryRepository,
+    private readonly farmRepository: FarmRepository
   ) {}
 
   async execute(userId: string, productId: string, dto: UpdateProductDto) {
+    
     const existingProduct = await this.productRepository.getByIdAndUserId({
       id: productId,
       userId: userId,
@@ -29,6 +33,20 @@ export class UpdateProductUseCase {
       if (nameExists) {
         throw ApiError.badRequest("Ya existe un producto con el mismo nombre.");
       }
+    }
+
+    let farm: Farm;
+    if (dto.categoryId) {
+      farm = await this.farmRepository.getByIdAndUserId({
+        id: dto.farmId,
+        userId: userId,
+      });
+
+      if (!farm) {
+        throw ApiError.notFound("Categoría no encontrada.");
+      }
+    } else {
+      farm = existingProduct.farm;
     }
 
     let category: Category;
@@ -50,7 +68,10 @@ export class UpdateProductUseCase {
       description: dto.description ?? existingProduct.description,
       price: dto.price ?? existingProduct.price,
       category: category,
+      farm: farm,
     });
+
+    
 
     await this.productRepository.update(existingProduct);
 
