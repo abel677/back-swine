@@ -3,6 +3,7 @@ import { FarmRepository } from "../../../farms/domain/contracts/farm.repository"
 import { PhaseRepository } from "../../../farms/domain/contracts/phase.repository";
 import { ApiError } from "../../../shared/exceptions/custom-error";
 import { PigRepository } from "../../domain/contracts/pig.repository";
+import { PigWeight } from "../../domain/entities/pig-weight";
 import { PigMapper } from "../../infrastructure/mappers/pig.mapper";
 import { UpdatePigDto } from "../dtos/update-pig.dto";
 
@@ -70,8 +71,14 @@ export class UpdatePigUseCase {
       pig.updateInitialPrice(dto.initialPrice);
     }
 
-    await this.pigRepository.update(pig);
+    // actualizar pesos
+    if (dto.weights) {
+      dto.weights.map((weight) => {
+        pig.updateWeight(weight);
+      });
+    }
 
+    await this.pigRepository.update(pig);
     return PigMapper.fromDomainToHttpResponse(pig);
   }
 }

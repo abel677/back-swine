@@ -50,11 +50,11 @@ export class AppRoutes {
   private pigRoutes(): Router {
     const router = Router();
 
-    router.put(
-      "/add-weight/:id",
-      [AuthMiddleware.validateJWT],
-      asyncHandler(this.deps.pigCtrl.createPigWight)
-    );
+    // router.put(
+    //   "/add-weight/:id",
+    //   [AuthMiddleware.validateJWT],
+    //   asyncHandler(this.deps.pigCtrl.createPigWight)
+    // );
 
     router.put(
       "/:id",

@@ -4,6 +4,7 @@ import { PigWeight } from "../../domain/entities/pig-weight";
 export class PigWeightMapper {
   static fromDomainToHttpResponse(pigWeight: PigWeight) {
     return {
+      id: pigWeight.id,
       pigId: pigWeight.pigId,
       days: pigWeight.days,
       weight: pigWeight.weight,

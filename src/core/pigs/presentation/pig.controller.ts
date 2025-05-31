@@ -61,7 +61,7 @@ export class PigController {
     const result = await this.createPigWeightUseCase.execute(pigId, dto);
     return res.status(201).json({
       message: "Peso agregado con exito.",
-      data: result,
+      pig: result,
     });
   };
 }

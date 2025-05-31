@@ -9,7 +9,7 @@ import {
   PigType,
 } from "../../../shared/domain/enums";
 import { ApiError } from "../../../shared/exceptions/custom-error";
-import { PigWeight } from "./pig-weight";
+import { CreatePigWeight, PigWeight, UpdatePigWeight } from "./pig-weight";
 import { ReproductiveHistory } from "./reproductive-state-history.entity";
 
 export interface PigProps {
@@ -135,15 +135,19 @@ export class Pig {
     this.updateTimestamp();
   }
 
-  addWeight(weight: PigWeight) {
-    this.props.weights.unshift(weight);
-  }
-
-  updateWeight(weightId: string, newValue: PigWeight) {
-    let index = this.props.weights.findIndex((w) => w.id === weightId);
-    if (!index) throw ApiError.notFound(`Peso no encontrado`);
-    this.props.weights[index] = newValue;
-    this.updateTimestamp();
+  updateWeight(pigWeight: UpdatePigWeight) {
+    let weight = this.props.weights.find((w) => w.id === pigWeight.id);
+    if (weight) {
+      weight.update(pigWeight);
+      this.updateTimestamp();
+    } else {
+      const newWight = PigWeight.create({
+        pigId: this.id,
+        weight: pigWeight.weight,
+        days: pigWeight.days,
+      });
+      this.props.weights.unshift(newWight);
+    }
   }
 
   updateAgeDays(ageDays: number) {

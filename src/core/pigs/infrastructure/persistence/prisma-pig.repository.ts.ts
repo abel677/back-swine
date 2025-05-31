@@ -66,7 +66,11 @@ export class PrismaPigRepository implements PigRepository {
             startDate: "desc",
           },
         },
-        weights: true,
+        weights: {
+          orderBy: {
+            updatedAt: "desc"
+          }
+        },
       },
       orderBy: {
         updatedAt: "desc",
@@ -111,7 +115,11 @@ export class PrismaPigRepository implements PigRepository {
             startDate: "desc",
           },
         },
-        weights: true,
+        weights: {
+          orderBy: {
+            updatedAt: "desc"
+          }
+        },
       },
       orderBy: {
         updatedAt: "desc",
@@ -159,7 +167,11 @@ export class PrismaPigRepository implements PigRepository {
             startDate: "desc",
           },
         },
-        weights: true,
+        weights: {
+          orderBy: {
+            updatedAt: "desc"
+          }
+        },
       },
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
@@ -200,7 +212,11 @@ export class PrismaPigRepository implements PigRepository {
             startDate: "desc",
           },
         },
-        weights: true,
+        weights: {
+          orderBy: {
+            updatedAt: "desc"
+          }
+        },
       },
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
@@ -249,7 +265,11 @@ export class PrismaPigRepository implements PigRepository {
             startDate: "desc",
           },
         },
-        weights: true,
+        weights: {
+          orderBy: {
+            updatedAt: "desc"
+          }
+        },
       },
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
@@ -290,7 +310,11 @@ export class PrismaPigRepository implements PigRepository {
             startDate: "desc",
           },
         },
-        weights: true,
+        weights: {
+          orderBy: {
+            updatedAt: "desc"
+          }
+        },
       },
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;
@@ -331,7 +355,11 @@ export class PrismaPigRepository implements PigRepository {
             startDate: "desc",
           },
         },
-        weights: true,
+        weights: {
+          orderBy: {
+            updatedAt: "desc"
+          }
+        },
       },
     });
     return entity ? PigMapper.fromPersistenceToDomain(entity) : null;

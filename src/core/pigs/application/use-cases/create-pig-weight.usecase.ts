@@ -19,7 +19,6 @@ export class CreatePigWeightUseCase {
       weight: dto.weight,
     });
 
-    pig.addWeight(pigWeight);
 
     await this.pigRepository.update(pig);
     return PigMapper.fromDomainToHttpResponse(pig);
