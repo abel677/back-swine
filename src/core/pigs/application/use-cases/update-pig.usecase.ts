@@ -1,9 +1,9 @@
 import { BreedRepository } from "../../../breeds/domain/contracts/breed.repository";
 import { FarmRepository } from "../../../farms/domain/contracts/farm.repository";
 import { PhaseRepository } from "../../../farms/domain/contracts/phase.repository";
+import { ProductRepository } from "../../../products/domain/contracts/product.repository";
 import { ApiError } from "../../../shared/exceptions/custom-error";
 import { PigRepository } from "../../domain/contracts/pig.repository";
-import { PigWeight } from "../../domain/entities/pig-weight";
 import { PigMapper } from "../../infrastructure/mappers/pig.mapper";
 import { UpdatePigDto } from "../dtos/update-pig.dto";
 
@@ -12,7 +12,8 @@ export class UpdatePigUseCase {
     private readonly farmRepository: FarmRepository,
     private readonly breedRepository: BreedRepository,
     private readonly phaseRepository: PhaseRepository,
-    private readonly pigRepository: PigRepository
+    private readonly pigRepository: PigRepository,
+    private readonly productRepository: ProductRepository
   ) {}
 
   async execute(userId: string, id: string, dto: UpdatePigDto) {
@@ -74,8 +75,33 @@ export class UpdatePigUseCase {
     // actualizar pesos
     if (dto.weights) {
       dto.weights.map((weight) => {
-        pig.updateWeight(weight);
+        pig.saveWeight(weight);
       });
+    }
+
+    // actualizar productos
+    if (dto.pigProducts) {
+      for (const pigProduct of dto.pigProducts) {
+        if (!pigProduct.id && !pigProduct.productId)
+          throw ApiError.badRequest(
+            "productId: ID producto inválido o faltante."
+          );
+
+        let product = undefined;
+        if (pigProduct.productId) {
+          product = await this.productRepository.getByIdAndUserId({
+            id: pigProduct.productId,
+            userId: userId,
+          });
+        }
+
+        pig.savePigProduct({
+          id: pigProduct.id,
+          price: pigProduct.price,
+          quantity: pigProduct.quantity,
+          product: product,
+        });
+      }
     }
 
     await this.pigRepository.update(pig);

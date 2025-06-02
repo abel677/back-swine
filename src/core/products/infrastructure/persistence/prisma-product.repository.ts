@@ -93,6 +93,7 @@ export class PrismaProductRepository implements ProductRepository {
       },
     });
     if (!entity) return null;
+
     return ProductMapper.toDomain(entity);
   }
   async getByIdAndFarmId(params: {

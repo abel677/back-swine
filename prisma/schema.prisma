@@ -235,6 +235,7 @@ model PigProduct {
   pigId     String
   productId String
   quantity  Decimal @db.Decimal(10, 3)
+  price  Decimal @db.Decimal(10, 3)
 
   createdAt DateTime
   updatedAt DateTime

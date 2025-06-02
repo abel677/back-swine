@@ -57,6 +57,16 @@ export class ReproductiveHistoryMapper {
                     };
                   };
                 };
+                products: {
+                  include: {
+                    product: {
+                      include: {
+                        category: true;
+                        farm: true;
+                      };
+                    };
+                  };
+                };
               };
             };
             reproductiveHistory: true;

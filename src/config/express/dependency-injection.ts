@@ -25,7 +25,6 @@ import { ReproductiveStateController } from "../../core/farms/presentation/repro
 import { CreateSowNotificationsUseCase } from "../../core/notifications/application/use-cases/create-sow-notification.usecase";
 import { DeleteSowNotificationUseCase } from "../../core/notifications/application/use-cases/delete-sow-notification.usecase";
 import { PrismaNotificationRepository } from "../../core/notifications/infrastructure/prisma-notification.repository";
-import { CreatePigWeightUseCase } from "../../core/pigs/application/use-cases/create-pig-weight.usecase";
 import { CreatePigUseCase } from "../../core/pigs/application/use-cases/create-pig.usecase";
 import { GetAllPigUseCase } from "../../core/pigs/application/use-cases/get-all-pig.usecase";
 import { PigReproductiveCalculatorUseCase } from "../../core/pigs/application/use-cases/pig-reproductive-calculator.usecase";
@@ -186,10 +185,10 @@ const pigUseCases = {
     repositories.farmRepository,
     repositories.breedRepository,
     repositories.phaseRepository,
-    repositories.pigRepository
+    repositories.pigRepository,
+    repositories.productRepository
   ),
   getAll: new GetAllPigUseCase(repositories.pigRepository),
-  createWeight: new CreatePigWeightUseCase(repositories.pigRepository),
 };
 
 // 5. Controladores
@@ -228,7 +227,6 @@ const controllers = {
   pigCtrl: new PigController(
     pigUseCases.create,
     pigUseCases.getAll,
-    pigUseCases.createWeight,
     pigUseCases.update
   ),
 };

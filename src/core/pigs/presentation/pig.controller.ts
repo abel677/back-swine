@@ -3,17 +3,15 @@ import { CreatePigUseCase } from "../application/use-cases/create-pig.usecase";
 import { CreatePigDto } from "../application/dtos/create-pig.dto";
 import { ApiError } from "../../shared/exceptions/custom-error";
 import { GetAllPigUseCase } from "../application/use-cases/get-all-pig.usecase";
-import { CreateWeightPigDto } from "../application/dtos/create-weight.dto";
-import { CreatePigWeightUseCase } from "../application/use-cases/create-pig-weight.usecase";
 import { UpdatePigDto } from "../application/dtos/update-pig.dto";
 import { UpdatePigUseCase } from "../application/use-cases/update-pig.usecase";
+import { ApplyProductDto } from "../application/dtos/apply-product-pig.dto";
 
 export class PigController {
   constructor(
     private readonly createPigUseCase: CreatePigUseCase,
     private readonly getAllPigUseCase: GetAllPigUseCase,
-    private readonly createPigWeightUseCase: CreatePigWeightUseCase,
-    private readonly updatePigWeightUseCase: UpdatePigUseCase
+    private readonly updatePigWeightUseCase: UpdatePigUseCase,
   ) {}
 
   delete = async (req: Request, res: Response) => {};
@@ -53,15 +51,14 @@ export class PigController {
     });
   };
 
-  createPigWight = async (req: Request, res: Response) => {
-    const pigId = req.params.id;
-    const [error, dto] = CreateWeightPigDto.create(req.body);
-    if (error) throw ApiError.badRequest(error);
-
-    const result = await this.createPigWeightUseCase.execute(pigId, dto);
-    return res.status(201).json({
-      message: "Peso agregado con exito.",
-      pig: result,
-    });
-  };
+  // applyProduct = async (req: Request, res: Response) => {
+  //   const userId = req.body.payload.id;
+  //   const [error, dto] = ApplyProductDto.create(req.body);
+  //   if (error) throw ApiError.badRequest(error);
+  //   const result = await this.applyPigProductUseCase.execute(userId, dto);
+  //   return res.status(201).json({
+  //     message: "Cerdo actualizado con exito.",
+  //     pig: result,
+  //   });
+  // };
 }

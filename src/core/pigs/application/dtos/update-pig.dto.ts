@@ -12,9 +12,17 @@ export class UpdatePigDto {
     public readonly ageDays?: number,
     public readonly initialPrice?: number,
     public readonly weights?: {
-      id: string;
-      days: number;
-      weight: number;
+      id?: string;
+      days?: number;
+      weight?: number;
+    }[],
+    public readonly pigProducts?: {
+      id?: string;
+      productId?: string;
+      quantity?: number;
+      price?: number;
+      date?: string;
+      observation?: number;
     }[]
   ) {}
 
@@ -65,7 +73,7 @@ export class UpdatePigDto {
 
     // Validación de ageDays
     if (
-      body.ageDays !== undefined &&
+      body.ageDays &&
       (typeof body.ageDays !== "number" ||
         body.ageDays < 0 ||
         !Number.isInteger(body.ageDays))
@@ -75,7 +83,7 @@ export class UpdatePigDto {
 
     // Validación de initialPrice
     if (
-      body.initialPrice !== undefined &&
+      body.initialPrice &&
       (typeof body.initialPrice !== "number" || body.initialPrice < 0)
     ) {
       return [
@@ -84,36 +92,60 @@ export class UpdatePigDto {
     }
 
     // Validación de weights (array de objetos {id?, days, weight})
-    if (body.weights !== undefined) {
+    if (body.weights) {
       if (!Array.isArray(body.weights)) {
         return ["weights: Debe ser un array de objetos {id?, days, weight}"];
       }
 
       for (const weight of body.weights) {
-        // Validar id (opcional, pero si viene debe ser UUID válido)
-        // if (
-        //   weight.id !== undefined &&
-        //   (typeof weight.id !== "string" || !Validators.isValidUUID(weight.id))
-        // ) {
-        //   return [
-        //     "weights: El campo 'id' debe ser un UUID válido cuando está presente",
-        //   ];
-        // }
-
         // Validar days
         if (
-          typeof weight.days !== "number" ||
-          weight.days < 0 ||
-          !Number.isInteger(weight.days)
+          weight.days &&
+          (typeof weight.days !== "number" ||
+            weight.days < 0 ||
+            !Number.isInteger(weight.days))
         ) {
           return ["weights: El campo 'days' debe ser un entero positivo"];
         }
 
         // Validar weight
-        if (typeof weight.weight !== "number" || weight.weight <= 0) {
+        if (
+          weight.weight &&
+          (typeof weight.weight !== "number" || weight.weight <= 0)
+        ) {
           return [
             "weights: El campo 'weight' debe ser un número positivo mayor que cero",
           ];
+        }
+      }
+    }
+
+    // Validación de pigProduct (array de objetos {})
+    if (body.pigProducts) {
+      if (!Array.isArray(body.pigProducts)) {
+        return [
+          "pigProducts: Debe ser un array de objetos {id?, productId, quantity, price, date, observation?}",
+        ];
+      }
+
+      for (const product of body.pigProducts) {
+        if (product.productId && !Validators.isValidUUID(product.productId)) {
+          return ["productId: ID inválido o faltante."];
+        }
+        if (
+          product.quantity &&
+          (typeof product.quantity !== "number" || product.quantity <= 0)
+        ) {
+          return ["quantity: Precio inválido o faltante."];
+        }
+        if (
+          product.price &&
+          (typeof product.price !== "number" || product.price <= 0)
+        ) {
+          return ["price: Precio inválido o faltante."];
+        }
+        if (body.date && !Validators.date.test(product.date)) {
+          return ["date: Fecha inválida o faltante."];
         }
       }
     }
@@ -129,7 +161,8 @@ export class UpdatePigDto {
         body.code,
         body.ageDays,
         body.initialPrice,
-        body.weights
+        body.weights,
+        body.pigProducts
       ),
     ];
   }

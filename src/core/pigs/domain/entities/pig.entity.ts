@@ -1,6 +1,7 @@
 import { Breed } from "../../../breeds/domain/entities/breed.entity";
 import { Farm } from "../../../farms/domain/entities/farm.entity";
 import { Phase } from "../../../farms/domain/entities/phase.entity";
+import { Product } from "../../../products/domain/entities/product.entity";
 import { DomainDateTime } from "../../../shared/domain-datetime";
 import {
   PigPhase,
@@ -9,7 +10,8 @@ import {
   PigType,
 } from "../../../shared/domain/enums";
 import { ApiError } from "../../../shared/exceptions/custom-error";
-import { CreatePigWeight, PigWeight, UpdatePigWeight } from "./pig-weight";
+import { PigProduct, UpdatePigProduct } from "./pig-product.entity";
+import { PigWeight, UpdatePigWeight } from "./pig-weight";
 import { ReproductiveHistory } from "./reproductive-state-history.entity";
 
 export interface PigProps {
@@ -23,6 +25,7 @@ export interface PigProps {
   initialPrice: number;
   investedPrice: number;
   weights: PigWeight[];
+  pigProducts: PigProduct[];
   sowReproductiveHistory: ReproductiveHistory[];
   state: PigState;
   motherId?: string;
@@ -36,6 +39,7 @@ interface CreatePigProps
   extends Omit<
     PigProps,
     | "weights"
+    | "pigProducts"
     | "investedPrice"
     | "sowReproductiveHistory"
     | "state"
@@ -55,6 +59,7 @@ export class Pig {
       investedPrice: 0,
       state: PigState.Alive,
       weights: [],
+      pigProducts: [],
       sowReproductiveHistory: [],
       createdAt: currentDate,
       updatedAt: currentDate,
@@ -135,8 +140,30 @@ export class Pig {
     this.updateTimestamp();
   }
 
-  updateWeight(pigWeight: UpdatePigWeight) {
-    let weight = this.props.weights.find((w) => w.id === pigWeight.id);
+  savePigProduct(pigProduct: UpdatePigProduct) {
+    const product = this.props.pigProducts.find((p) => p.id === pigProduct.id);
+
+    if (product) {
+      const previousPrice = product.price;
+      const newPrice = pigProduct.price;
+      this.props.investedPrice += newPrice - previousPrice;
+      product.update({ ...product, ...pigProduct });
+    } else {
+      if (!pigProduct.product)
+        throw ApiError.notFound("Producto no encontrado.");
+      const newProduct = PigProduct.create({
+        pigId: this.id,
+        product: pigProduct.product,
+        quantity: pigProduct.quantity,
+        price: pigProduct.price,
+      });
+      this.props.investedPrice += pigProduct.price;
+      this.props.pigProducts.unshift(newProduct);
+    }
+  }
+
+  saveWeight(pigWeight: UpdatePigWeight) {
+    const weight = this.props.weights.find((w) => w.id === pigWeight.id);
     if (weight) {
       weight.update(pigWeight);
       this.updateTimestamp();
@@ -188,6 +215,9 @@ export class Pig {
   }
   get weights() {
     return this.props.weights;
+  }
+  get pigProducts() {
+    return this.props.pigProducts;
   }
   get sowReproductiveHistory() {
     return this.props.sowReproductiveHistory;

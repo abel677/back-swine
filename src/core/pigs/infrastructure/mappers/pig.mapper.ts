@@ -6,6 +6,7 @@ import { PigSex, PigState, PigType } from "../../../shared/domain/enums";
 import { Pig } from "../../domain/entities/pig.entity";
 import { PigWeightMapper } from "./pig-weight.mapper";
 import { ReproductiveHistoryMapper } from "./reproductive-state-history.mapper";
+import { PigProductMapper } from "./pig-product.mapper";
 
 export class PigMapper {
   static fromDomainToHttpResponse(pig: Pig) {
@@ -25,6 +26,9 @@ export class PigMapper {
       fatherId: pig.fatherId,
       weights: pig.weights?.map((w) =>
         PigWeightMapper.fromDomainToHttpResponse(w)
+      ),
+      pigProducts: pig.pigProducts?.map((p) =>
+        PigProductMapper.fromDomainToHttpResponse(p)
       ),
       sowReproductiveHistory: pig.sowReproductiveHistory?.map((re) =>
         ReproductiveHistoryMapper.fromDomainToHttpResponse(re)
@@ -63,6 +67,16 @@ export class PigMapper {
             };
           };
         };
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true;
+                farm: true;
+              };
+            };
+          };
+        };
       };
     }>
   ): Pig {
@@ -87,6 +101,9 @@ export class PigMapper {
       birthId: data.birthId,
       weights: data.weights?.map((w) =>
         PigWeightMapper.fromPersistenceToDomain(w)
+      ),
+      pigProducts: data.products?.map((p) =>
+        PigProductMapper.fromPersistenceToDomain(p)
       ),
       sowReproductiveHistory: data.sowReproductiveHistory?.map((r) =>
         ReproductiveHistoryMapper.fromPersistenceToDomain(r)
@@ -204,6 +221,41 @@ export class PigMapper {
             updatedAt: w.updatedAt,
           },
         })),
+      },
+      products: {
+        upsert: pig.pigProducts.map((p) => {
+          console.log(p);
+
+          return {
+            where: { id: p.id },
+            update: {
+              quantity: p.quantity,
+              price: p.price,
+              product: p.product
+                ? {
+                    connect: {
+                      id: p.product.id,
+                    },
+                  }
+                : undefined,
+              updatedAt: p.updatedAt,
+            },
+            create: {
+              id: p.id,
+              quantity: p.quantity,
+              price: p.price,
+              product: p.product
+                ? {
+                    connect: {
+                      id: p.product.id,
+                    },
+                  }
+                : undefined,
+              createdAt: p.createdAt,
+              updatedAt: p.updatedAt,
+            },
+          };
+        }),
       },
     };
   }

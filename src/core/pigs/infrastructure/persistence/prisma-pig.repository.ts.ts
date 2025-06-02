@@ -23,6 +23,81 @@ export class PrismaPigRepository implements PigRepository {
   }
 
   // consultas
+
+  async getAllByIdsAndUserId(params: {
+    ids: string[];
+    userId: string;
+  }): Promise<Pig[] | null> {
+    const entities = await this.prisma.pig.findMany({
+      where: {
+        id: { in: params.ids },
+        farm: {
+          OR: [
+            { ownerId: params.userId },
+            { farmUsers: { some: { userId: params.userId } } },
+          ],
+        },
+      },
+      include: {
+        farm: true,
+        breed: true,
+        phase: true,
+        birth: true,
+        sowReproductiveHistory: {
+          include: {
+            reproductiveState: true,
+            boar: true,
+            sow: true,
+            births: {
+              include: {
+                piglets: {
+                  include: {
+                    farm: true,
+                    phase: true,
+                    breed: true,
+                    birth: true,
+                    mother: true,
+                    father: true,
+                  },
+                },
+                reproductiveHistory: true,
+              },
+              orderBy: {
+                birthDate: "desc",
+              },
+            },
+          },
+          orderBy: {
+            startDate: "desc",
+          },
+        },
+        weights: {
+          orderBy: {
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return entities.map((entity) => PigMapper.fromPersistenceToDomain(entity));
+  }
+
   async getAllByUserId(userId: string): Promise<Pig[]> {
     const entities = await this.prisma.pig.findMany({
       where: {
@@ -68,8 +143,21 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: {
           orderBy: {
-            updatedAt: "desc"
-          }
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
         },
       },
       orderBy: {
@@ -78,7 +166,6 @@ export class PrismaPigRepository implements PigRepository {
     });
     return entities.map((entity) => PigMapper.fromPersistenceToDomain(entity));
   }
-
   async getAllByFarmId(farmId: string): Promise<Pig[]> {
     const entities = await this.prisma.pig.findMany({
       where: { farmId: farmId },
@@ -117,8 +204,21 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: {
           orderBy: {
-            updatedAt: "desc"
-          }
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
         },
       },
       orderBy: {
@@ -169,8 +269,21 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: {
           orderBy: {
-            updatedAt: "desc"
-          }
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
         },
       },
     });
@@ -214,8 +327,21 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: {
           orderBy: {
-            updatedAt: "desc"
-          }
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
         },
       },
     });
@@ -267,8 +393,21 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: {
           orderBy: {
-            updatedAt: "desc"
-          }
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
         },
       },
     });
@@ -312,8 +451,21 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: {
           orderBy: {
-            updatedAt: "desc"
-          }
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
         },
       },
     });
@@ -357,8 +509,21 @@ export class PrismaPigRepository implements PigRepository {
         },
         weights: {
           orderBy: {
-            updatedAt: "desc"
-          }
+            updatedAt: "desc",
+          },
+        },
+        products: {
+          include: {
+            product: {
+              include: {
+                category: true,
+                farm: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
         },
       },
     });

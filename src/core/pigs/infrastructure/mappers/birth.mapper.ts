@@ -50,8 +50,19 @@ export class BirthMapper {
                 };
               };
             };
+            products: {
+              include: {
+                product: {
+                  include: {
+                    category: true;
+                    farm: true;
+                  };
+                };
+              };
+            };
           };
         };
+
         reproductiveHistory: true;
       };
     }>

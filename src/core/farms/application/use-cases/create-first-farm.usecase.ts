@@ -48,7 +48,7 @@ export class CreateFirstFarmUseCase {
       lactationDurationDays: 21,
       weaningDurationDays: 0,
       restingDurationDays: 7,
-      initialPigletPrice: 60
+      initialPigletPrice: 60,
     });
 
     await this.settingRepository.create(setting);
@@ -127,13 +127,14 @@ export class CreateFirstFarmUseCase {
     const categories: Category[] = [
       Category.create({
         farmId: farm.id,
-        name: "Vacuna",
+        name: "Vacunas",
       }),
       Category.create({
         farmId: farm.id,
-        name: "Balanceado",
+        name: "Balanceados",
       }),
     ];
+
     await this.categoryRepository.createMany(categories);
 
     // todo: crear los productos por defecto
@@ -141,3 +142,50 @@ export class CreateFirstFarmUseCase {
     return FarmMapper.fromDomainToHttpResponse(farm);
   }
 }
+/**
+ * 
+ * 
+ * [
+  {
+    "nombre": "Mycoplasma hyopneumoniae",
+    "descripcion": "Previene la neumonía enzoótica porcina. Se aplica principalmente en lechones.",
+    "precio": 2.00
+  },
+  {
+    "nombre": "Circovirus porcino tipo 2 (PCV2)",
+    "descripcion": "Protege contra enfermedades asociadas al circovirus, como el síndrome multisistémico posdestete.",
+    "precio": 2.80
+  },
+  {
+    "nombre": "Peste Porcina Clásica (PPC)",
+    "descripcion": "Vacuna obligatoria en zonas endémicas. Protege contra una enfermedad viral altamente contagiosa.",
+    "precio": 1.50
+  },
+  {
+    "nombre": "Erisipela Porcina",
+    "descripcion": "Previene la erisipela, que causa fiebre, lesiones en la piel y artritis en cerdos.",
+    "precio": 1.70
+  },
+  {
+    "nombre": "Leptospira",
+    "descripcion": "Protege contra varias especies de Leptospira que pueden causar abortos y otros problemas reproductivos.",
+    "precio": 2.30
+  },
+  {
+    "nombre": "Parvovirus Porcino (PPV)",
+    "descripcion": "Vacuna reproductiva para prevenir abortos y nacimientos muertos.",
+    "precio": 2.10
+  },
+  {
+    "nombre": "Mal Rojo (Erysipelothrix rhusiopathiae)",
+    "descripcion": "Previene infecciones bacterianas que afectan piel, articulaciones y corazón.",
+    "precio": 1.90
+  },
+  {
+    "nombre": "Vacuna combinada (PPV + Leptospira + Mal Rojo)",
+    "descripcion": "Protección múltiple en una sola aplicación para cerdas reproductoras.",
+    "precio": 4.50
+  }
+]
+
+ */
