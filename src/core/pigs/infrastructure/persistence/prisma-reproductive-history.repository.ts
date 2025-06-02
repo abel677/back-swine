@@ -16,7 +16,7 @@ export class PrismaReproductiveHistory
         reproductiveState: true,
         sow: true,
         boar: true,
-        births: {
+        birth: {
           include: {
             piglets: {
               include: {
@@ -45,7 +45,7 @@ export class PrismaReproductiveHistory
         reproductiveState: true,
         sow: true,
         boar: true,
-        births: {
+        birth: {
           include: {
             piglets: {
               include: {

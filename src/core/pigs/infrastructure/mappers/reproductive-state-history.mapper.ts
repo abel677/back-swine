@@ -15,9 +15,9 @@ export class ReproductiveHistoryMapper {
       endDate: reproductiveHistory.props.endDate,
       sowId: reproductiveHistory.props.sowId,
       boarId: reproductiveHistory.props.boarId,
-      births: reproductiveHistory.props.births.map((history) =>
-        BirthMapper.fromDomainToHttpResponse(history)
-      ),
+      birth: reproductiveHistory.birth
+        ? BirthMapper.fromDomainToHttpResponse(reproductiveHistory.birth)
+        : null,
     };
   }
 
@@ -27,7 +27,7 @@ export class ReproductiveHistoryMapper {
         reproductiveState: true;
         sow: true;
         boar: true;
-        births: {
+        birth: {
           include: {
             piglets: {
               include: {
@@ -41,7 +41,7 @@ export class ReproductiveHistoryMapper {
                     reproductiveState: true;
                     sow: true;
                     boar: true;
-                    births: {
+                    birth: {
                       include: {
                         piglets: {
                           include: {
@@ -85,9 +85,9 @@ export class ReproductiveHistoryMapper {
       endDate: data.endDate,
       sowId: data.sowId,
       boarId: data.boarId,
-      births: data.births.map((birth) =>
-        BirthMapper.fromPersistenceToDomain(birth)
-      ),
+      birth: data.birth
+        ? BirthMapper.fromPersistenceToDomain(data.birth)
+        : null,
     });
   }
 

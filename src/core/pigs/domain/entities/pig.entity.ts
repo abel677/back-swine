@@ -1,7 +1,6 @@
 import { Breed } from "../../../breeds/domain/entities/breed.entity";
 import { Farm } from "../../../farms/domain/entities/farm.entity";
 import { Phase } from "../../../farms/domain/entities/phase.entity";
-import { Product } from "../../../products/domain/entities/product.entity";
 import { DomainDateTime } from "../../../shared/domain-datetime";
 import {
   PigPhase,
@@ -27,6 +26,7 @@ export interface PigProps {
   weights: PigWeight[];
   pigProducts: PigProduct[];
   sowReproductiveHistory: ReproductiveHistory[];
+  currentSowReproductiveHistory?: ReproductiveHistory
   state: PigState;
   motherId?: string;
   fatherId?: string;
@@ -42,6 +42,7 @@ interface CreatePigProps
     | "pigProducts"
     | "investedPrice"
     | "sowReproductiveHistory"
+    | "currentSowReproductiveHistory"
     | "state"
     | "createdAt"
     | "updatedAt"
@@ -61,6 +62,7 @@ export class Pig {
       weights: [],
       pigProducts: [],
       sowReproductiveHistory: [],
+      currentSowReproductiveHistory: undefined,
       createdAt: currentDate,
       updatedAt: currentDate,
     });
@@ -221,6 +223,9 @@ export class Pig {
   }
   get sowReproductiveHistory() {
     return this.props.sowReproductiveHistory;
+  }
+  get currentSowReproductiveHistory() {
+    return this.props.currentSowReproductiveHistory;
   }
   get motherId() {
     return this.props.motherId;

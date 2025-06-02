@@ -11,7 +11,7 @@ export class BirthMapper {
       femalePiglets: birth.femalePiglets,
       deadPiglets: birth.deadPiglets,
       averageLitterWeight: birth.averageLitterWeight,
-      piglets: birth.piglets.map((p) => PigMapper.fromDomainToHttpResponse(p)),
+      piglets: birth.piglets?.map((p) => PigMapper.fromDomainToHttpResponse(p)),
       isLitterWeaned: birth.isLitterWeaned,
       reproductiveHistoryId: birth.reproductiveHistoryId,
       createdAt: birth.createdAt,
@@ -34,7 +34,7 @@ export class BirthMapper {
                 reproductiveState: true;
                 sow: true;
                 boar: true;
-                births: {
+                birth: {
                   include: {
                     piglets: {
                       include: {

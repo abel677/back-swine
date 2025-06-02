@@ -137,9 +137,9 @@ export class CreatePigUseCase {
 
       // crear registro de parto
       if (isLactation) {
+        this.validateBirthData(dto);
         const birth = Birth.create({
           reproductiveHistoryId: history.id,
-          numberBirth: 1,
           birthDate: dto.startDate,
           malePiglets: dto.numberMalePiglets,
           femalePiglets: dto.numberFemalePiglets,
@@ -221,5 +221,43 @@ export class CreatePigUseCase {
     await this.pigRepository.create(newPig);
 
     return PigMapper.fromDomainToHttpResponse(newPig);
+  }
+
+  private validateBirthData(dto: CreatePigDto) {
+    if (
+      typeof dto.numberFemalePiglets !== "number" ||
+      dto.numberFemalePiglets < 0
+    ) {
+      throw ApiError.badRequest(
+        "numberFemalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido."
+      );
+    }
+
+    if (
+      typeof dto.numberMalePiglets !== "number" ||
+      dto.numberMalePiglets < 0
+    ) {
+      throw ApiError.badRequest(
+        "numberMalePiglets: Número de lechones machos vivos obligatorio y debe ser válido."
+      );
+    }
+
+    if (
+      typeof dto.numberDeadPiglets !== "number" ||
+      dto.numberDeadPiglets < 0
+    ) {
+      throw ApiError.badRequest(
+        "numberDeadPiglets: Número de lechones muertos obligatorio y debe ser válido."
+      );
+    }
+
+    if (
+      typeof dto.averageLiterWeight !== "number" ||
+      dto.averageLiterWeight < 0
+    ) {
+      throw ApiError.badRequest(
+        "averageLiterWeight: Peso promedio de la camada obligatorio y debe ser válido."
+      );
+    }
   }
 }

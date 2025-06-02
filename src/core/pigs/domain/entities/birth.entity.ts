@@ -20,7 +20,7 @@ export interface BirthProps {
 interface CreateBirthProps
   extends Omit<
     BirthProps,
-    "isLitterWeaned" | "createdAt" | "updatedAt" | "piglets"
+    "isLitterWeaned" | "createdAt" | "updatedAt" | "piglets" | "numberBirth"
   > {}
 
 export class Birth {
@@ -30,9 +30,19 @@ export class Birth {
   ) {}
 
   static create(props: CreateBirthProps) {
+    if (
+      (props.femalePiglets <= 0 && props.malePiglets <= 0) &&
+      props.averageLitterWeight > 0
+    ) {
+      throw ApiError.badRequest(
+        "averageLitterWeight: No se encontraron lechones, no puede agregar un peso mayor a cero."
+      );
+    }
+
     const currentDate = DomainDateTime.now();
     return new Birth(crypto.randomUUID(), {
       ...props,
+      numberBirth: 1,
       isLitterWeaned: false,
       piglets: [],
       createdAt: currentDate,

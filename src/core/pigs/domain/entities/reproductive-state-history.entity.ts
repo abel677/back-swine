@@ -7,12 +7,12 @@ interface ReproductiveHistoryProps {
   startDate: Date;
   endDate: Date;
   sowId: string;
-  births: Birth[];
+  birth: Birth;
   boarId: string;
 }
 
 interface CreateReproductiveHistoryProps
-  extends Omit<ReproductiveHistoryProps, "sequential" | "births"> {}
+  extends Omit<ReproductiveHistoryProps, "sequential" | "birth"> {}
 
 export class ReproductiveHistory {
   private constructor(
@@ -24,7 +24,7 @@ export class ReproductiveHistory {
     return new ReproductiveHistory(crypto.randomUUID(), {
       ...props,
       sequential: 1,
-      births: [],
+      birth: null,
     });
   }
   static fromPrimitives(
@@ -36,7 +36,7 @@ export class ReproductiveHistory {
   }
 
   addBirth(birth: Birth) {
-    this.props.births.unshift(birth);
+    this.props.birth = (birth);
   }
 
   get sequential() {
@@ -54,8 +54,8 @@ export class ReproductiveHistory {
   get sowId() {
     return this.props.sowId;
   }
-  get births() {
-    return this.props.births;
+  get birth() {
+    return this.props.birth;
   }
   get boarId() {
     return this.props.boarId;

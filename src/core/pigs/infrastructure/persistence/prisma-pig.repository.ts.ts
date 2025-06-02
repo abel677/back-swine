@@ -48,7 +48,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -61,9 +61,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },
@@ -118,7 +115,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -131,9 +128,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },
@@ -179,7 +173,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -192,9 +186,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },
@@ -244,7 +235,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -257,9 +248,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },
@@ -302,7 +290,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -315,9 +303,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },
@@ -368,7 +353,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -381,9 +366,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },
@@ -426,7 +408,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -439,9 +421,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },
@@ -484,7 +463,7 @@ export class PrismaPigRepository implements PigRepository {
             reproductiveState: true,
             boar: true,
             sow: true,
-            births: {
+            birth: {
               include: {
                 piglets: {
                   include: {
@@ -497,9 +476,6 @@ export class PrismaPigRepository implements PigRepository {
                   },
                 },
                 reproductiveHistory: true,
-              },
-              orderBy: {
-                birthDate: "desc",
               },
             },
           },

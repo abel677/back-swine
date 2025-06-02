@@ -85,7 +85,8 @@ export class CreatePigDto {
       }
 
       if (
-        typeof body.numberFemalePiglets !== "number" ||
+        (body.numberFemalePiglets &&
+          typeof body.numberFemalePiglets !== "number") ||
         body.numberFemalePiglets < 0
       ) {
         return [
@@ -94,7 +95,8 @@ export class CreatePigDto {
       }
 
       if (
-        typeof body.numberMalePiglets !== "number" ||
+        (body.numberMalePiglets &&
+          typeof body.numberMalePiglets !== "number") ||
         body.numberMalePiglets < 0
       ) {
         return [
@@ -103,7 +105,8 @@ export class CreatePigDto {
       }
 
       if (
-        typeof body.numberDeadPiglets !== "number" ||
+        (body.numberDeadPiglets &&
+          typeof body.numberDeadPiglets !== "number") ||
         body.numberDeadPiglets < 0
       ) {
         return [
@@ -112,7 +115,8 @@ export class CreatePigDto {
       }
 
       if (
-        typeof body.averageLiterWeight !== "number" ||
+        (body.averageLiterWeight &&
+          typeof body.averageLiterWeight !== "number") ||
         body.averageLiterWeight < 0
       ) {
         return [

@@ -1,11 +1,25 @@
 import { BreedRepository } from "../../../breeds/domain/contracts/breed.repository";
+import { Breed } from "../../../breeds/domain/entities/breed.entity";
 import { FarmRepository } from "../../../farms/domain/contracts/farm.repository";
 import { PhaseRepository } from "../../../farms/domain/contracts/phase.repository";
+import { ReproductiveStateRepository } from "../../../farms/domain/contracts/reproductive-state.repository";
+import { SettingRepository } from "../../../farms/domain/contracts/setting.repository";
+import { CreateSowNotificationsUseCase } from "../../../notifications/application/use-cases/create-sow-notification.usecase";
 import { ProductRepository } from "../../../products/domain/contracts/product.repository";
+import {
+  PigPhase,
+  PigReproductiveState,
+  PigSex,
+  PigType,
+} from "../../../shared/domain/enums";
 import { ApiError } from "../../../shared/exceptions/custom-error";
 import { PigRepository } from "../../domain/contracts/pig.repository";
+import { Birth } from "../../domain/entities/birth.entity";
+import { Pig } from "../../domain/entities/pig.entity";
+import { ReproductiveHistory } from "../../domain/entities/reproductive-state-history.entity";
 import { PigMapper } from "../../infrastructure/mappers/pig.mapper";
 import { UpdatePigDto } from "../dtos/update-pig.dto";
+import { PigReproductiveCalculatorUseCase } from "./pig-reproductive-calculator.usecase";
 
 export class UpdatePigUseCase {
   constructor(
@@ -13,7 +27,11 @@ export class UpdatePigUseCase {
     private readonly breedRepository: BreedRepository,
     private readonly phaseRepository: PhaseRepository,
     private readonly pigRepository: PigRepository,
-    private readonly productRepository: ProductRepository
+    private readonly productRepository: ProductRepository,
+    private readonly reproductiveStateRepository: ReproductiveStateRepository,
+    private readonly pigCalculatorUseCase: PigReproductiveCalculatorUseCase,
+    private readonly createSowNotificationUseCase: CreateSowNotificationsUseCase,
+    private readonly settingRepository: SettingRepository
   ) {}
 
   async execute(userId: string, id: string, dto: UpdatePigDto) {
@@ -58,7 +76,7 @@ export class UpdatePigUseCase {
     if (dto.code && dto.code !== pig.code) {
       const existingPig = await this.pigRepository.getByCodeAndFarmId({
         code: dto.code,
-        farmId: dto.farmId,
+        farmId: dto.farmId ?? pig.farm.id,
       });
       if (existingPig && existingPig.id !== pig.id) {
         throw ApiError.badRequest("Ya existe otro cerdo con ese código.");
@@ -102,6 +120,74 @@ export class UpdatePigUseCase {
           product: product,
         });
       }
+    }
+
+
+    // información de cerda reproductora
+    if (pig.isSow() && dto.reproductiveStateId) {
+ 
+      // verificar si existe el estado reproductivo a asignar
+      const nexReproductiveState = await this.reproductiveStateRepository.getByIdAndUserId(
+        {
+          userId: userId, 
+          id: dto.reproductiveStateId
+        }
+      );
+      if (!nexReproductiveState) {
+        throw ApiError.notFound("Estado reproductivo no encontrado.");
+      }
+
+
+      // obtener el estado reproductivo actual
+      const { reproductiveState: currentReproductiveState } = pig.currentSowReproductiveHistory
+
+      const { name } = nexReproductiveState as { name: PigReproductiveState };
+      const isInsemination = name === PigReproductiveState.Insemination;
+      const isGestation = name === PigReproductiveState.Gestation;
+      const isLactation = name === PigReproductiveState.Lactation;
+
+
+      //si está en inseminación | gestación | lactancia verificar si hay un reproductor y validar que tenga una fase permitida
+      let boar: Pig = undefined;
+      if (isInsemination || isGestation || isLactation) {
+        if (dto.boarId) {
+          boar = await this.pigRepository.getByIdAndFarmId(
+            {
+              farmId: dto.farmId,
+              id: dto.boarId,
+            }
+          );
+          if (!boar) {
+            throw ApiError.notFound("Cerdo reproductor no encontrado.");
+          }
+          const disallowedPhases = [
+            PigPhase.Neonatal,
+            PigPhase.Weaning,
+            PigPhase.Starter,
+          ];
+
+          if (disallowedPhases.includes(boar.phase.name as PigPhase)) {
+            throw ApiError.badRequest(
+              "Cerdo reproductor no cumple con edad o fase permitida."
+            );
+          }
+          
+        }
+      }
+
+      if(isLactation){
+         return
+      }
+
+
+
+
+      await this.createSowNotificationUseCase.execute({
+        farmId: pig.farm.id,
+        code: pig.code,
+        dateStart: dto.startDate,
+        reproductiveState: name,
+      });
     }
 
     await this.pigRepository.update(pig);

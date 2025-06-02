@@ -186,7 +186,11 @@ const pigUseCases = {
     repositories.breedRepository,
     repositories.phaseRepository,
     repositories.pigRepository,
-    repositories.productRepository
+    repositories.productRepository,
+    repositories.reproductiveStateRepository,
+    pigReproductiveCalculatorUseCase,
+    notificationUseCases.createSowNotifications,
+    repositories.settingRepository
   ),
   getAll: new GetAllPigUseCase(repositories.pigRepository),
 };

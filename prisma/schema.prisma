@@ -199,12 +199,12 @@ model ReproductiveHistory {
   sow               Pig               @relation("SowPig", fields: [sowId], references: [id], onDelete: Cascade)
   boar              Pig?              @relation("BoarPig", fields: [boarId], references: [id], onDelete: Cascade)
   reproductiveState ReproductiveState @relation(fields: [reproductiveStateId], references: [id], onDelete: Cascade)
-  births            Birth[]
+  birth             Birth?            @relation("ReproductiveHistoryBirth")
 }
 
 model Birth {
   id                    String   @unique @default(uuid())
-  reproductiveHistoryId String
+  reproductiveHistoryId String   @unique 
   numberBirth           Int
   birthDate             DateTime
   malePiglets           Int
@@ -216,7 +216,7 @@ model Birth {
   updatedAt             DateTime
 
   piglets             Pig[]               @relation("BirthPiglets")
-  reproductiveHistory ReproductiveHistory @relation(fields: [reproductiveHistoryId], references: [id], onDelete: Cascade)
+  reproductiveHistory ReproductiveHistory @relation("ReproductiveHistoryBirth", fields: [reproductiveHistoryId], references: [id], onDelete: Cascade)
 }
 
 model PigWeight {
@@ -235,7 +235,7 @@ model PigProduct {
   pigId     String
   productId String
   quantity  Decimal @db.Decimal(10, 3)
-  price  Decimal @db.Decimal(10, 3)
+  price     Decimal @db.Decimal(10, 3)
 
   createdAt DateTime
   updatedAt DateTime

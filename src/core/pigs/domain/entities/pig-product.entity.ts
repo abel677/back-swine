@@ -11,10 +11,7 @@ export interface PigProductProps {
 }
 
 type CreatePigProduct = Omit<PigProductProps, "createdAt" | "updatedAt">;
-export type UpdatePigProduct = Omit<
-  Partial<PigProduct>,
-  "createdAt" | "updatedAt" | "pigId"
->;
+export type UpdatePigProduct = Omit<Partial<PigProduct>,"createdAt" | "updatedAt" | "pigId">;
 
 export class PigProduct {
   constructor(
