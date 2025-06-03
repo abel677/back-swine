@@ -7,14 +7,14 @@ export class ReproductiveHistoryMapper {
   static fromDomainToHttpResponse(reproductiveHistory: ReproductiveHistory) {
     return {
       id: reproductiveHistory.id,
-      sequential: reproductiveHistory.props.sequential,
+      sequential: reproductiveHistory.sequential,
       reproductiveState: ReproductiveStateMapper.fromDomainToHttpResponse(
-        reproductiveHistory.props.reproductiveState
+        reproductiveHistory.reproductiveState
       ),
-      startDate: reproductiveHistory.props.startDate,
-      endDate: reproductiveHistory.props.endDate,
-      sowId: reproductiveHistory.props.sowId,
-      boarId: reproductiveHistory.props.boarId,
+      startDate: reproductiveHistory.startDate,
+      endDate: reproductiveHistory.endDate,
+      sowId: reproductiveHistory.sowId,
+      boarId: reproductiveHistory.boarId,
       birth: reproductiveHistory.birth
         ? BirthMapper.fromDomainToHttpResponse(reproductiveHistory.birth)
         : null,
@@ -96,21 +96,21 @@ export class ReproductiveHistoryMapper {
   ): Prisma.ReproductiveHistoryCreateInput {
     return {
       id: reproductiveHistory.id,
-      sequential: reproductiveHistory.props.sequential,
-      startDate: reproductiveHistory.props.startDate,
-      endDate: reproductiveHistory.props.endDate,
+      sequential: reproductiveHistory.sequential,
+      startDate: reproductiveHistory.startDate,
+      endDate: reproductiveHistory.endDate,
       sow: {
         connect: {
-          id: reproductiveHistory.props.sowId,
+          id: reproductiveHistory.sowId,
         },
       },
       boar: {
         connect: {
-          id: reproductiveHistory.props.boarId,
+          id: reproductiveHistory.boarId,
         },
       },
       reproductiveState: {
-        connect: { id: reproductiveHistory.props.reproductiveState.id },
+        connect: { id: reproductiveHistory.reproductiveState.id },
       },
     };
   }
@@ -120,21 +120,21 @@ export class ReproductiveHistoryMapper {
   ): Prisma.ReproductiveHistoryUpdateInput {
     return {
       id: reproductiveHistory.id,
-      sequential: reproductiveHistory.props.sequential,
-      startDate: reproductiveHistory.props.startDate,
-      endDate: reproductiveHistory.props.endDate,
+      sequential: reproductiveHistory.sequential,
+      startDate: reproductiveHistory.startDate,
+      endDate: reproductiveHistory.endDate,
       sow: {
         connect: {
-          id: reproductiveHistory.props.sowId,
+          id: reproductiveHistory.sowId,
         },
       },
       boar: {
         connect: {
-          id: reproductiveHistory.props.boarId,
+          id: reproductiveHistory.boarId,
         },
       },
       reproductiveState: {
-        connect: { id: reproductiveHistory.props.reproductiveState.id },
+        connect: { id: reproductiveHistory.reproductiveState.id },
       },
     };
   }
