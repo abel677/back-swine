@@ -33,8 +33,23 @@ export class PigProduct {
     });
   }
 
+  private updateTimeStamps() {
+    this.props.updatedAt = DomainDateTime.now();
+  }
+
+  savePrice(price: number) {
+    this.props.price = price;
+    this.updateTimeStamps()
+  }
+
+  saveQuantity(quantity: number) {
+    this.props.quantity = quantity;
+    this.updateTimeStamps();
+  }
+
   saveProduct(product: Product) {
     this.props.product = product;
+    this.updateTimeStamps()
   }
 
   get price() {

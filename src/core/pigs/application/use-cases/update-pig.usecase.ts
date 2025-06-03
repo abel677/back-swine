@@ -16,6 +16,8 @@ import {
 import { ApiError } from "../../../shared/exceptions/custom-error";
 import { PigRepository } from "../../domain/contracts/pig.repository";
 import { Birth } from "../../domain/entities/birth.entity";
+import { PigProduct } from "../../domain/entities/pig-product.entity";
+import { PigWeight } from "../../domain/entities/pig-weight";
 import { Pig } from "../../domain/entities/pig.entity";
 import { ReproductiveHistory } from "../../domain/entities/reproductive-state-history.entity";
 import { PigMapper } from "../../infrastructure/mappers/pig.mapper";
@@ -89,6 +91,60 @@ export class UpdatePigUseCase {
     }
     if (dto.initialPrice) {
       pig.saveInitialPrice(dto.initialPrice);
+    }
+    // actualizar pesos
+    if (dto.weights) {
+      for (const pigWeight of dto.weights) {
+        const pwFind = pig.weights.find((pw) => pw.id === pigWeight.id);
+        if (pwFind) {
+          if (pigWeight.days) pwFind.saveDays(pigWeight.days);
+          if (pigWeight.weight) pwFind.saveWeight(pigWeight.weight);
+          pig.saveWeight(pwFind);
+        } else {
+          const weight = PigWeight.create({
+            days: pigWeight.days,
+            weight: pigWeight.weight,
+            pigId: pig.id,
+          });
+          pig.saveWeight(weight);
+        }
+      }
+    }
+
+    // actualizar productos
+    if (dto.pigProducts) {
+      for (const pigProduct of dto.pigProducts) {
+        if (!pigProduct.id && !pigProduct.productId)
+          throw ApiError.badRequest(
+            "productId: ID producto inválido o faltante."
+          );
+
+        let product = undefined;
+        if (pigProduct.productId) {
+          product = await this.productRepository.getByIdAndUserId({
+            id: pigProduct.productId,
+            userId: userId,
+          });
+
+          const ppFind = pig.pigProducts.find((p) => p.id === pigProduct.id);
+          if (ppFind) {
+            if (product) ppFind.saveProduct(product);
+            if (pigProduct.quantity) ppFind.saveQuantity(pigProduct.quantity);
+            if (pigProduct.price) ppFind.savePrice(pigProduct.price);
+            pig.savePigProduct(ppFind);
+          } else {
+            if (!product) throw ApiError.notFound("Producto no encontrado.");
+            pig.savePigProduct(
+              PigProduct.create({
+                pigId: pig.id,
+                price: pigProduct.price,
+                product: product,
+                quantity: pigProduct.quantity,
+              })
+            );
+          }
+        }
+      }
     }
 
     // información para cerdas reproductoras
@@ -249,31 +305,6 @@ export class UpdatePigUseCase {
         pig.saveSowReproductiveHistory(history);
       }
     }
-
-    // actualizar pesos
-    // if (dto.weights) {
-    //   for (const weight of dto.weights) {
-    //     // verificar si existe el peso
-    //   }
-    // }
-
-    // actualizar productos
-    // if (dto.pigProducts) {
-    //   for (const pigProduct of dto.pigProducts) {
-    //     if (!pigProduct.id && !pigProduct.productId)
-    //       throw ApiError.badRequest(
-    //         "productId: ID producto inválido o faltante."
-    //       );
-
-    //     let product = undefined;
-    //     if (pigProduct.productId) {
-    //       product = await this.productRepository.getByIdAndUserId({
-    //         id: pigProduct.productId,
-    //         userId: userId,
-    //       });
-    //     }
-    //   }
-    // }
 
     await this.pigRepository.update(pig);
     return PigMapper.fromDomainToHttpResponse(pig);

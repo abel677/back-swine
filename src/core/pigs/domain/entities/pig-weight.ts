@@ -32,6 +32,19 @@ export class PigWeight {
     });
   }
 
+  private updateTimeStamps() {
+    this.props.updatedAt = DomainDateTime.now();
+  }
+
+  saveWeight(weight: number) {
+    this.props.weight = weight;
+    this.updateTimeStamps();
+  }
+  saveDays(days: number) {
+    this.props.days = days;
+    this.updateTimeStamps();
+  }
+
   get pigId() {
     return this.props.pigId;
   }
