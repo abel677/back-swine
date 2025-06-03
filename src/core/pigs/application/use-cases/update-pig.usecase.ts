@@ -152,6 +152,7 @@ export class UpdatePigUseCase {
           nextState.name as PigReproductiveState,
           sowHistory.startDate
         );
+
         const history = ReproductiveHistory.create({
           startDate: sowHistory.startDate,
           endDate: endDate,
@@ -234,6 +235,16 @@ export class UpdatePigUseCase {
             }
           });
         }
+        if (reproductiveState === PigReproductiveState.Weaning) {
+          const phasePiglet = await this.phaseRepository.getByNameAndUserId({
+            name: PigPhase.Weaning,
+            userId: userId,
+          });
+          const currentSowReproductiveHistory =
+            pig.currentSowReproductiveHistory;
+          currentSowReproductiveHistory.birth.weanLitter(phasePiglet);
+          pig.saveSowReproductiveHistory(currentSowReproductiveHistory);
+        }
         history.saveSequential(pig.sowReproductiveHistory.length + 1);
         pig.saveSowReproductiveHistory(history);
       }
@@ -264,7 +275,7 @@ export class UpdatePigUseCase {
     //   }
     // }
 
-    //await this.pigRepository.update(pig);
+    await this.pigRepository.update(pig);
     return PigMapper.fromDomainToHttpResponse(pig);
   }
 
