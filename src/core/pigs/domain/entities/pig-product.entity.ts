@@ -11,27 +11,12 @@ export interface PigProductProps {
 }
 
 type CreatePigProduct = Omit<PigProductProps, "createdAt" | "updatedAt">;
-export type UpdatePigProduct = Omit<Partial<PigProduct>,"createdAt" | "updatedAt" | "pigId">;
 
 export class PigProduct {
   constructor(
     public readonly id: string,
     private readonly props: PigProductProps
   ) {}
-
-  update(props: UpdatePigProduct) {
-    if (props.product) {
-      this.props.product = props.product;
-    }
-    if (props.quantity) {
-      this.props.quantity = props.quantity;
-    }
-    if (props.price) {
-      this.props.price = props.price;
-    }
-
-    this.props.updatedAt = DomainDateTime.now();
-  }
 
   static create(props: CreatePigProduct) {
     const id = crypto.randomUUID();
@@ -46,6 +31,10 @@ export class PigProduct {
     return new PigProduct(data.id, {
       ...data,
     });
+  }
+
+  saveProduct(product: Product) {
+    this.props.product = product;
   }
 
   get price() {

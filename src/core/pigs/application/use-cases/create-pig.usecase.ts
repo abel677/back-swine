@@ -75,148 +75,154 @@ export class CreatePigUseCase {
       initialPrice: dto.initialPrice,
     });
 
-    // verificar si es una reproductora y tiene un estado reproductivo
-    // if (newPig.isSow() && dto.reproductiveStateId) {
-    //   const reproductiveState =
-    //     await this.reproductiveStateRepository.getByIdAndUserId({
-    //       userId,
-    //       id: dto.reproductiveStateId,
-    //     });
-    //   if (!reproductiveState) {
-    //     throw ApiError.notFound("Estado reproductivo no encontrado.");
-    //   }
+    // información para cerdas reproductoras
+    if (newPig.isSow() && dto.reproductiveStateId) {
+      // permitir asignar un estado reproductivo a cerdas a partir del crecimiento y mayor = 150 días
+      if (newPig.cannotAssignReproductiveState()) {
+        throw ApiError.badRequest(
+          "Cerda reproductora no acta para asignar estado reproductivo."
+        );
+      }
 
-    //   const reproductiveStateName =
-    //     reproductiveState.name as PigReproductiveState;
-    //   const isInsemination =
-    //     reproductiveStateName === PigReproductiveState.Insemination;
-    //   const isGestation =
-    //     reproductiveStateName === PigReproductiveState.Gestation;
-    //   const isLactation =
-    //     reproductiveStateName === PigReproductiveState.Lactation;
+      // verificar si existe el estado reproductivo
+      const reproductiveStateModel =
+        await this.reproductiveStateRepository.getByIdAndUserId({
+          userId,
+          id: dto.reproductiveStateId,
+        });
+      if (!reproductiveStateModel) {
+        throw ApiError.notFound("Estado reproductivo no encontrado.");
+      }
+      const reproductiveState =
+        reproductiveStateModel.name as PigReproductiveState;
 
-    //   // validar si hay un cerdo reproductor si el estado reproductivo = inseminación | gestación | lactancia
-    //   let boar: Pig;
-    //   if (isInsemination || isGestation || isLactation) {
-    //     if (dto.boarId) {
-    //       boar = await this.pigRepository.getByIdAndFarmId({
-    //         farmId: dto.farmId,
-    //         id: dto.boarId,
-    //       });
-    //       if (!boar) {
-    //         throw ApiError.notFound("Cerdo reproductor no encontrado.");
-    //       }
-    //       if (
-    //         [PigPhase.Neonatal, PigPhase.Weaning, PigPhase.Starter].includes(
-    //           boar.phase.name as PigPhase
-    //         )
-    //       ) {
-    //         throw ApiError.badRequest(
-    //           "Cerdo reproductor no cumple con edad o fase permitida."
-    //         );
-    //       }
-    //     }
-    //   }
+      const isInsemination =
+        reproductiveState === PigReproductiveState.Insemination;
+      const isGestation = reproductiveState === PigReproductiveState.Gestation;
+      const isLactation = reproductiveState === PigReproductiveState.Lactation;
 
-    //   // calcular fecha final del estado reproductivo
-    //   const { endDate } = await this.pigCalculatorUseCase.execute(
-    //     farm.id,
-    //     reproductiveState.name as PigReproductiveState,
-    //     dto.startDate
-    //   );
+      // validar si hay un cerdo reproductor si el estado reproductivo = inseminación | gestación | lactancia
+      let boar: Pig;
+      if (isInsemination || isGestation || isLactation) {
+        if (dto.boarId) {
+          boar = await this.pigRepository.getByIdAndFarmId({
+            farmId: dto.farmId,
+            id: dto.boarId,
+          });
+          if (!boar) {
+            throw ApiError.notFound("Cerdo reproductor no encontrado.");
+          }
+          if (
+            [PigPhase.Neonatal, PigPhase.Weaning, PigPhase.Starter].includes(
+              boar.phase.name as PigPhase
+            )
+          ) {
+            throw ApiError.badRequest(
+              "Cerdo reproductor no cumple con edad o fase permitida."
+            );
+          }
+        }
+      }
 
-    //   // crear historial reproductivo
-    //   const history = ReproductiveHistory.create({
-    //     sowId: newPig.id,
-    //     startDate: dto.startDate,
-    //     endDate: endDate,
-    //     reproductiveState,
-    //     boarId: boar ? boar.id : undefined,
-    //     sequential: 1,
-    //   });
+      // calcular fecha final del estado reproductivo
+      const { endDate } = await this.pigCalculatorUseCase.execute(
+        farm.id,
+        reproductiveState,
+        dto.startDate
+      );
 
-    //   // crear registro de parto
-    //   if (isLactation) {
-    //     this.validateBirthData(dto);
-    //     const birth = Birth.create({
-    //       reproductiveHistoryId: history.id,
-    //       birthDate: dto.startDate,
-    //       malePiglets: dto.numberMalePiglets,
-    //       femalePiglets: dto.numberFemalePiglets,
-    //       deadPiglets: dto.numberDeadPiglets,
-    //       averageLitterWeight: dto.averageLiterWeight,
-    //     });
-    //     history.addBirth(birth);
+      // crear historial reproductivo
+      const history = ReproductiveHistory.create({
+        sowId: newPig.id,
+        startDate: dto.startDate,
+        endDate: endDate,
+        reproductiveState: reproductiveStateModel,
+        boarId: boar ? boar.id : undefined,
+      });
 
-    //     // obtener la raza de los lechones
-    //     const sowBreedName = newPig.breed.name;
-    //     const boarBreedName = boar?.breed.name;
+      // crear registro de parto
+      if (isLactation) {
+        this.validateBirthData(dto);
+        const birth = Birth.create({
+          reproductiveHistoryId: history.id,
+          birthDate: dto.startDate,
+          malePiglets: dto.numberMalePiglets,
+          femalePiglets: dto.numberFemalePiglets,
+          deadPiglets: dto.numberDeadPiglets,
+          averageLitterWeight: dto.averageLiterWeight,
+        });
+        history.saveBirth(birth);
 
-    //     const isSameBreed = boarBreedName === sowBreedName;
+        // obtener la raza de los lechones
+        const sowBreedName = newPig.breed.name;
+        const boarBreedName = boar?.breed.name;
 
-    //     const pigletBreedName =
-    //       boarBreedName && !isSameBreed
-    //         ? `${sowBreedName} x ${boarBreedName}`
-    //         : sowBreedName;
+        const isSameBreed = boarBreedName === sowBreedName;
 
-    //     let pigletBreed = await this.breedRepository.getByNameAndUserId({
-    //       name: pigletBreedName,
-    //       userId,
-    //     });
+        const pigletBreedName =
+          boarBreedName && !isSameBreed
+            ? `${sowBreedName} x ${boarBreedName}`
+            : sowBreedName;
 
-    //     if (!pigletBreed) {
-    //       pigletBreed = Breed.create({
-    //         name: pigletBreedName,
-    //         farmId: dto.farmId,
-    //       });
-    //       await this.breedRepository.create(pigletBreed);
-    //     }
+        let pigletBreed = await this.breedRepository.getByNameAndUserId({
+          name: pigletBreedName,
+          userId,
+        });
 
-    //     const phasePiglet = await this.phaseRepository.getByNameAndUserId({
-    //       name: PigPhase.Neonatal,
-    //       userId: userId,
-    //     });
+        if (!pigletBreed) {
+          pigletBreed = Breed.create({
+            name: pigletBreedName,
+            farmId: dto.farmId,
+          });
+          await this.breedRepository.create(pigletBreed);
+        }
 
-    //     // crear registros para los lechones
-    //     const pigletsConfig = [
-    //       {
-    //         count: dto.numberFemalePiglets,
-    //         sex: PigSex.Female,
-    //       },
-    //       {
-    //         count: dto.numberMalePiglets,
-    //         sex: PigSex.Male,
-    //       },
-    //     ];
-    //     const setting = await this.settingRepository.getByFarmId(dto.farmId);
-    //     pigletsConfig.forEach(({ count, sex }) => {
-    //       for (let i = 0; i < count; i++) {
-    //         const piglet = Pig.create({
-    //           farm: farm,
-    //           breed: pigletBreed,
-    //           phase: phasePiglet,
-    //           code: `P${sex === PigSex.Female ? "H" : "M"}P-${Date.now()}`,
-    //           ageDays: 0,
-    //           initialPrice: setting.initialPigletPrice,
-    //           type: PigType.Production,
-    //           sex: sex,
-    //           birthId: birth.id,
-    //           fatherId: boar ? boar.id : undefined,
-    //           motherId: newPig.id,
-    //         });
+        const phasePiglet = await this.phaseRepository.getByNameAndUserId({
+          name: PigPhase.Neonatal,
+          userId: userId,
+        });
 
-    //         birth.addPiglet(piglet);
-    //       }
-    //     });
-    //   }
-    //   newPig.addSowReproductiveHistory(history);
-    //   await this.createSowNotificationUseCase.execute({
-    //     farmId: dto.farmId,
-    //     code: newPig.code,
-    //     dateStart: dto.startDate,
-    //     reproductiveState: reproductiveStateName,
-    //   });
-    // }
+        // crear registros para los lechones
+        const pigletsConfig = [
+          {
+            count: dto.numberFemalePiglets,
+            sex: PigSex.Female,
+          },
+          {
+            count: dto.numberMalePiglets,
+            sex: PigSex.Male,
+          },
+        ];
+        const setting = await this.settingRepository.getByFarmId(dto.farmId);
+        pigletsConfig.forEach(({ count, sex }) => {
+          for (let i = 0; i < count; i++) {
+            const piglet = Pig.create({
+              farm: farm,
+              breed: pigletBreed,
+              phase: phasePiglet,
+              code: `P${sex === PigSex.Female ? "H" : "M"}P-${Date.now()}`,
+              ageDays: 0,
+              initialPrice: setting.initialPigletPrice,
+              type: PigType.Production,
+              sex: sex,
+              birthId: birth.id,
+              fatherId: boar ? boar.id : undefined,
+              motherId: newPig.id,
+            });
+
+            birth.savePiglet(piglet);
+          }
+        });
+      }
+      newPig.saveSowReproductiveHistory(history);
+      await this.createSowNotificationUseCase.execute({
+        farmId: dto.farmId,
+        code: newPig.code,
+        dateStart: dto.startDate,
+        reproductiveState: reproductiveState,
+      });
+    }
+
 
     await this.pigRepository.create(newPig);
 

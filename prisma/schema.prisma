@@ -204,7 +204,7 @@ model ReproductiveHistory {
 
 model Birth {
   id                    String   @unique @default(uuid())
-  reproductiveHistoryId String   @unique 
+  reproductiveHistoryId String   @unique
   numberBirth           Int
   birthDate             DateTime
   malePiglets           Int
@@ -240,8 +240,8 @@ model PigProduct {
   createdAt DateTime
   updatedAt DateTime
 
-  product Product @relation(fields: [productId], references: [id])
-  pig     Pig     @relation(fields: [pigId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  pig     Pig     @relation(fields: [pigId], references: [id], onDelete: Cascade)
 }
 
 model Setting {

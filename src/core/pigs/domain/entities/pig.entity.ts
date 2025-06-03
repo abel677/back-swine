@@ -9,14 +9,14 @@ import {
   PigType,
 } from "../../../shared/domain/enums";
 import { ApiError } from "../../../shared/exceptions/custom-error";
-import { PigProduct, UpdatePigProduct } from "./pig-product.entity";
-import { PigWeight, UpdatePigWeight } from "./pig-weight";
+import { PigProduct } from "./pig-product.entity";
+import { PigWeight } from "./pig-weight";
 import { ReproductiveHistory } from "./reproductive-state-history.entity";
 
 export interface PigProps {
-  farm: Farm;
   type: PigType;
   sex: PigSex;
+  farm: Farm;
   phase: Phase;
   breed: Breed;
   code: string;
@@ -25,31 +25,39 @@ export interface PigProps {
   investedPrice: number;
   weights: PigWeight[];
   pigProducts: PigProduct[];
-  sowReproductiveHistory: ReproductiveHistory[];
-  currentSowReproductiveHistory?: ReproductiveHistory
   state: PigState;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // datos de reproductora
+  currentSowReproductiveHistory?: ReproductiveHistory;
+  sowReproductiveHistory?: ReproductiveHistory[];
+
+  // datos de lechones
   motherId?: string;
   fatherId?: string;
   birthId?: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface CreatePigProps
   extends Omit<
     PigProps,
+    | "investedPrice"
     | "weights"
     | "pigProducts"
-    | "investedPrice"
-    | "sowReproductiveHistory"
-    | "currentSowReproductiveHistory"
     | "state"
     | "createdAt"
     | "updatedAt"
+    | "currentSowReproductiveHistory"
+    | "sowReproductiveHistory"
   > {}
 
 export class Pig {
   private constructor(public readonly id: string, private props: PigProps) {}
+
+  static fromPrimitives(data: { id: string } & PigProps) {
+    return new Pig(data.id, { ...data });
+  }
 
   static create(props: CreatePigProps) {
     const id = crypto.randomUUID();
@@ -58,22 +66,15 @@ export class Pig {
     return new Pig(id, {
       ...props,
       investedPrice: 0,
-      state: PigState.Alive,
       weights: [],
       pigProducts: [],
-      sowReproductiveHistory: [],
-      currentSowReproductiveHistory: undefined,
+      state: PigState.Alive,
       createdAt: currentDate,
       updatedAt: currentDate,
+      // datos para reproductoras
+      sowReproductiveHistory: [],
+      currentSowReproductiveHistory: undefined,
     });
-  }
-
-  static fromPrimitives(data: { id: string } & PigProps) {
-    return new Pig(data.id, { ...data });
-  }
-
-  private updateTimestamp() {
-    this.props.updatedAt = DomainDateTime.now();
   }
 
   isSow() {
@@ -93,6 +94,60 @@ export class Pig {
     return false;
   }
 
+  saveFarm(farm: Farm) {
+    this.props.farm = farm;
+    this.updateTimestamp();
+  }
+  savePhase(phase: Phase) {
+    this.props.phase = phase;
+    this.updateTimestamp();
+  }
+  saveBreed(newBreed: Breed) {
+    this.props.breed = newBreed;
+    this.updateTimestamp();
+  }
+  saveCode(code: string) {
+    this.props.code = code;
+  }
+  saveAgeDays(ageDays: number) {
+    this.props.ageDays = ageDays;
+    this.updateTimestamp();
+  }
+  saveInitialPrice(initialPrice: number) {
+    this.props.initialPrice = initialPrice;
+  }
+  saveWeight(pigWeight: PigWeight) {
+    const index = this.props.weights.findIndex((w) => w.id === pigWeight.id);
+    if (index !== -1) {
+      this.props.weights[index] = pigWeight;
+      this.updateTimestamp();
+    } else {
+      this.props.weights.unshift(pigWeight);
+    }
+  }
+  savePigProduct(pigProduct: PigProduct) {
+    const index = this.props.pigProducts.findIndex(
+      (p) => p.id === pigProduct.id
+    );
+
+    if (index !== -1) {
+      const previousPrice = this.pigProducts[index].price;
+      const newPrice = pigProduct.price;
+      this.props.investedPrice += newPrice - previousPrice;
+      this.pigProducts[index] = pigProduct;
+      this.updateTimestamp();
+    } else {
+      this.props.investedPrice += pigProduct.price;
+      this.props.pigProducts.unshift(pigProduct);
+    }
+  }
+  saveState(state: PigState) {
+    this.props.state = state;
+  }
+  private updateTimestamp() {
+    this.props.updatedAt = DomainDateTime.now();
+  }
+
   cannotAssignReproductiveState(): boolean {
     const forbiddenPhases: PigPhase[] = [
       PigPhase.Neonatal,
@@ -105,83 +160,32 @@ export class Pig {
     );
   }
 
-  addSowReproductiveHistory(history: ReproductiveHistory) {
+  saveCurrentSowReproductiveHistory(
+    currentSowReproductiveHistory: ReproductiveHistory
+  ) {
+    this.props.currentSowReproductiveHistory = currentSowReproductiveHistory;
+  }
+  saveSowReproductiveHistory(sowReproductiveHistory: ReproductiveHistory) {
     if (!this.isSow()) {
       throw ApiError.badRequest(
-        "No se puede asignar un estado reproductivo a un cerdo que no sea reproductora."
+        "Sexo inválido para asignar estado reproductivo."
       );
     }
-
     if (this.cannotAssignReproductiveState()) {
       throw ApiError.badRequest(
-        "No se puede asignar un estado reproductivo por edad o fase no permitida."
+        "Cerda reproductora no acta para asignar estado reproductivo."
       );
     }
-    this.props.sowReproductiveHistory.unshift(history);
-  }
-
-  updateInitialPrice(initialPrice: number) {
-    this.props.initialPrice = initialPrice;
-  }
-  updateCode(code: string) {
-    this.props.code = code;
-  }
-
-  updatePhase(newPhase: Phase) {
-    this.props.phase = newPhase;
-    this.updateTimestamp();
-  }
-
-  updateFarm(farm: Farm) {
-    this.props.farm = farm;
-    this.updateTimestamp();
-  }
-
-  updateBreed(newBreed: Breed) {
-    this.props.breed = newBreed;
-    this.updateTimestamp();
-  }
-
-  savePigProduct(pigProduct: UpdatePigProduct) {
-    const product = this.props.pigProducts.find((p) => p.id === pigProduct.id);
-
-    if (product) {
-      const previousPrice = product.price;
-      const newPrice = pigProduct.price;
-      this.props.investedPrice += newPrice - previousPrice;
-      product.update({ ...product, ...pigProduct });
-    } else {
-      if (!pigProduct.product)
-        throw ApiError.notFound("Producto no encontrado.");
-      const newProduct = PigProduct.create({
-        pigId: this.id,
-        product: pigProduct.product,
-        quantity: pigProduct.quantity,
-        price: pigProduct.price,
-      });
-      this.props.investedPrice += pigProduct.price;
-      this.props.pigProducts.unshift(newProduct);
-    }
-  }
-
-  saveWeight(pigWeight: UpdatePigWeight) {
-    const weight = this.props.weights.find((w) => w.id === pigWeight.id);
-    if (weight) {
-      weight.update(pigWeight);
+    const index = this.props.sowReproductiveHistory.findIndex(
+      (srh) => srh.id === sowReproductiveHistory.id
+    );
+    if (index !== -1) {
+      this.props.sowReproductiveHistory[index] = sowReproductiveHistory;
       this.updateTimestamp();
     } else {
-      const newWight = PigWeight.create({
-        pigId: this.id,
-        weight: pigWeight.weight,
-        days: pigWeight.days,
-      });
-      this.props.weights.unshift(newWight);
+      this.sowReproductiveHistory.unshift(sowReproductiveHistory);
+      this.saveCurrentSowReproductiveHistory(sowReproductiveHistory);
     }
-  }
-
-  updateAgeDays(ageDays: number) {
-    this.props.ageDays = ageDays;
-    this.updateTimestamp();
   }
 
   get farm() {

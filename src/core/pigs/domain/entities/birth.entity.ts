@@ -5,22 +5,24 @@ import { Pig } from "./pig.entity";
 
 export interface BirthProps {
   reproductiveHistoryId: string;
-  numberBirth: number;
   birthDate: Date;
   malePiglets: number;
   femalePiglets: number;
   deadPiglets: number;
   averageLitterWeight: number;
+
+  // no obligatorios para creación
+  numberBirth: number;
   isLitterWeaned: boolean;
+  piglets: Pig[];
   createdAt: Date;
   updatedAt: Date;
-  piglets: Pig[];
 }
 
 interface CreateBirthProps
   extends Omit<
     BirthProps,
-    "isLitterWeaned" | "createdAt" | "updatedAt" | "piglets" | "numberBirth"
+    "numberBirth" | "isLitterWeaned" | "piglets" | "createdAt" | "updatedAt"
   > {}
 
 export class Birth {
@@ -29,16 +31,25 @@ export class Birth {
     private readonly props: BirthProps
   ) {}
 
-  static create(props: CreateBirthProps) {
+  static fromPrimitives(data: { id: string } & BirthProps): Birth {
+    return new Birth(data.id, {
+      ...data,
+    });
+  }
+  static validate(props: CreateBirthProps) {
     if (
-      (props.femalePiglets <= 0 && props.malePiglets <= 0) &&
+      props.femalePiglets <= 0 &&
+      props.malePiglets <= 0 &&
       props.averageLitterWeight > 0
     ) {
       throw ApiError.badRequest(
         "averageLitterWeight: No se encontraron lechones, no puede agregar un peso mayor a cero."
       );
     }
+  }
 
+  static create(props: CreateBirthProps) {
+    this.validate(props);
     const currentDate = DomainDateTime.now();
     return new Birth(crypto.randomUUID(), {
       ...props,
@@ -49,14 +60,28 @@ export class Birth {
       updatedAt: currentDate,
     });
   }
-  static fromPrimitives(data: { id: string } & BirthProps): Birth {
-    return new Birth(data.id, {
-      ...data,
-    });
+
+  savePiglet(pig: Pig) {
+    const index = this.props.piglets.findIndex(
+      (piglet) => piglet.id === pig.id
+    );
+    if (index !== -1) {
+      this.props.piglets[index] = pig;
+    } else {
+      this.props.piglets.unshift(pig);
+    }
+    this.updateTimeStamps();
   }
 
-  private updateTimeStamps() {
-    this.props.updatedAt = DomainDateTime.now();
+  weanLitter(phaseStarter: Phase): void {
+    this.props.isLitterWeaned = true;
+    this.updateTimeStamps();
+
+    this.props.piglets.forEach((piglet) => {
+      const ageDays = this.calculatePigletAge();
+      piglet.savePhase(phaseStarter);
+      piglet.saveAgeDays(ageDays);
+    });
   }
 
   private calculatePigletAge(): number {
@@ -65,32 +90,8 @@ export class Birth {
       DomainDateTime.now()
     );
   }
-
-  addPiglet(piglet: Pig) {
-    this.props.piglets.unshift(piglet);
-    this.updateTimeStamps();
-  }
-
-  updatePiglet(id: string, piglet: Pig) {
-    const index = this.props.piglets.findIndex((p) => p.id === id);
-    if (!index) throw ApiError.notFound("Cerdo no encontrado");
-    this.props.piglets[index] = piglet;
-    this.updateTimeStamps();
-  }
-
-  weanLitter(phaseStarter: Phase): void {
-    if (this.props.isLitterWeaned) {
-      throw ApiError.badRequest("La camada ya está marcado como destetada.");
-    }
-
-    this.props.isLitterWeaned = true;
-    this.updateTimeStamps();
-
-    this.props.piglets.forEach((piglet) => {
-      const ageDays = this.calculatePigletAge();
-      piglet.updatePhase(phaseStarter);
-      piglet.updateAgeDays(ageDays);
-    });
+  private updateTimeStamps() {
+    this.props.updatedAt = DomainDateTime.now();
   }
 
   get reproductiveHistoryId() {

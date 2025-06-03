@@ -65,7 +65,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {
@@ -132,7 +132,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {
@@ -190,7 +190,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {
@@ -252,7 +252,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {
@@ -307,7 +307,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {
@@ -370,7 +370,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {
@@ -425,7 +425,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {
@@ -480,7 +480,7 @@ export class PrismaPigRepository implements PigRepository {
             },
           },
           orderBy: {
-            startDate: "desc",
+            sequential: "desc",
           },
         },
         weights: {

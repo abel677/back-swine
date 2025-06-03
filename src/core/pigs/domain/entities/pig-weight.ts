@@ -10,11 +10,6 @@ interface PigWightProps {
 
 export type CreatePigWeight = Omit<PigWightProps, "createdAt" | "updatedAt">;
 
-export type UpdatePigWeight = Omit<
-  Partial<PigWeight>,
-  "createdAt" | "updatedAt" | "pigId"
->;
-
 export class PigWeight {
   private constructor(
     public readonly id: string,
@@ -35,16 +30,6 @@ export class PigWeight {
     return new PigWeight(data.id, {
       ...data,
     });
-  }
-
-  update(props: UpdatePigWeight) {
-    if (props.days) {
-      this.props.days = props.days;
-    }
-    if (props.weight) {
-      this.props.weight = props.weight;
-    }
-    this.props.updatedAt = DomainDateTime.now();
   }
 
   get pigId() {

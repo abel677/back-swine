@@ -2,17 +2,17 @@ import { ReproductiveState } from "../../../farms/domain/entities/reproductive-s
 import { Birth } from "./birth.entity";
 
 interface ReproductiveHistoryProps {
+  sowId: string;
   sequential: number;
   reproductiveState: ReproductiveState;
   startDate: Date;
   endDate: Date;
-  sowId: string;
-  birth: Birth;
-  boarId: string;
+  birth?: Birth;
+  boarId?: string;
 }
 
 interface CreateReproductiveHistoryProps
-  extends Omit<ReproductiveHistoryProps,"birth"> {}
+  extends Omit<ReproductiveHistoryProps, "sequential" | "birth"> {}
 
 export class ReproductiveHistory {
   private constructor(
@@ -20,12 +20,6 @@ export class ReproductiveHistory {
     private readonly props: ReproductiveHistoryProps
   ) {}
 
-  static create(props: CreateReproductiveHistoryProps) {
-    return new ReproductiveHistory(crypto.randomUUID(), {
-      ...props,
-      birth: null,
-    });
-  }
   static fromPrimitives(
     data: { id: string } & ReproductiveHistoryProps
   ): ReproductiveHistory {
@@ -34,8 +28,23 @@ export class ReproductiveHistory {
     });
   }
 
-  addBirth(birth: Birth) {
+  static create(props: CreateReproductiveHistoryProps) {
+    return new ReproductiveHistory(crypto.randomUUID(), {
+      ...props,
+      sequential: 1,
+    });
+  }
+
+  saveSequential(sequential: number) {
+    this.props.sequential = sequential;
+  }
+
+  saveBirth(birth: Birth) {
     this.props.birth = birth;
+  }
+
+  saveReproductiveState(reproductiveState: ReproductiveState) {
+    this.props.reproductiveState = reproductiveState;
   }
 
   get sequential() {

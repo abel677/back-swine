@@ -24,14 +24,16 @@ export class UpdatePigDto {
       date?: string;
       observation?: number;
     }[],
-    public readonly reproductiveStateId?: string,
-    public readonly boarId?: string,
-    public readonly startDate?: Date,
-
-    public readonly numberMalePiglets?: number,
-    public readonly numberFemalePiglets?: number,
-    public readonly numberDeadPiglets?: number,
-    public readonly averageLiterWeight?: number
+    public readonly sowReproductiveHistory?: {
+      id?: string;
+      reproductiveStateId?: string;
+      startDate?: Date;
+      numberMalePiglets?: number;
+      numberFemalePiglets?: number;
+      numberDeadPiglets?: number;
+      averageLiterWeight?: number;
+      boarId?: string;
+    }[]
   ) {}
 
   static create(body: { [key: string]: any }): [string?, UpdatePigDto?] {
@@ -160,69 +162,74 @@ export class UpdatePigDto {
 
     // Datos reproductivos
 
-    if (
-      body.reproductiveStateId &&
-      !Validators.isValidUUID(body.reproductiveStateId)
-    ) {
-      return ["reproductiveStateId: ID de estado reproductivo inválido."];
-    }
-
-    // si hay un estado reproductivo
-    if (body.reproductiveStateId) {
-      if (!Validators.date.test(body.startDate)) {
-        return ["startDate: Fecha de inicio obligatoria y debe ser válida."];
-      }
-
-      if (
-        (body.numberFemalePiglets &&
-          typeof body.numberFemalePiglets !== "number") ||
-        body.numberFemalePiglets < 0
-      ) {
+    if (body.sowReproductiveHistory) {
+      if (!Array.isArray(body.sowReproductiveHistory)) {
         return [
-          "numberFemalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido.",
+          "sowReproductiveHistory: Debe ser un array de objetos {id?, reproductiveStateId?, startDate?, numberMalePiglets?, numberFemalePiglets?, numberDeadPiglets?, averageLiterWeight?, boarId?}",
         ];
       }
 
-      if (
-        (body.numberMalePiglets &&
-          typeof body.numberMalePiglets !== "number") ||
-        body.numberMalePiglets < 0
-      ) {
-        return [
-          "numberMalePiglets: Número de lechones machos vivos obligatorio y debe ser válido.",
-        ];
-      }
+      for (const history of body.sowReproductiveHistory) {
+        if (
+          history.reproductiveStateId &&
+          !Validators.isValidUUID(history.reproductiveStateId)
+        ) {
+          return ["reproductiveStateId: ID de estado reproductivo inválido."];
+        }
 
-      if (
-        (body.numberDeadPiglets &&
-          typeof body.numberDeadPiglets !== "number") ||
-        body.numberDeadPiglets < 0
-      ) {
-        return [
-          "numberDeadPiglets: Número de lechones muertos obligatorio y debe ser válido.",
-        ];
-      }
+        if (history.startDate && !Validators.date.test(history.startDate)) {
+          return [
+            "startDate: Fecha inicio estado reproductivo inválida o faltante.",
+          ];
+        }
 
-      if (
-        (body.averageLiterWeight &&
-          typeof body.averageLiterWeight !== "number") ||
-        body.averageLiterWeight < 0
-      ) {
-        return [
-          "averageLiterWeight: Peso promedio de la camada obligatorio y debe ser válido.",
-        ];
+        if (
+          (history.numberFemalePiglets &&
+            typeof history.numberFemalePiglets !== "number") ||
+          history.numberFemalePiglets < 0
+        ) {
+          return [
+            "numberFemalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido.",
+          ];
+        }
+
+        if (
+          (history.numberMalePiglets &&
+            typeof history.numberMalePiglets !== "number") ||
+          history.numberMalePiglets < 0
+        ) {
+          return [
+            "numberMalePiglets: Número de lechones machos vivos obligatorio y debe ser válido.",
+          ];
+        }
+
+        if (
+          (history.numberDeadPiglets &&
+            typeof history.numberDeadPiglets !== "number") ||
+          history.numberDeadPiglets < 0
+        ) {
+          return [
+            "numberDeadPiglets: Número de lechones muertos obligatorio y debe ser válido.",
+          ];
+        }
+
+        if (
+          (history.averageLiterWeight &&
+            typeof history.averageLiterWeight !== "number") ||
+          history.averageLiterWeight < 0
+        ) {
+          return [
+            "averageLiterWeight: Peso promedio de la camada obligatorio y debe ser válido.",
+          ];
+        }
+
+        if (history.boarId && !Validators.isValidUUID(history.boarId)) {
+          return ["boarId: ID cerdo reproductor inválido."];
+        }
       }
     }
 
-    if (body.startDate && !Validators.date.test(body.startDate)) {
-      return [
-        "startDate: Fecha inicio estado reproductivo inválida o faltante.",
-      ];
-    }
 
-    if (body.boarId && !Validators.isValidUUID(body.boarId)) {
-      return ["boarId: ID cerdo reproductor inválido."];
-    }
 
     return [
       undefined,
@@ -235,18 +242,9 @@ export class UpdatePigDto {
         body.code,
         body.ageDays,
         body.initialPrice,
-
         body.weights,
         body.pigProducts,
-
-        body.reproductiveStateId,
-        body.boarId,
-        new Date(body.startDate),
-
-        body.numberMalePiglets,
-        body.numberFemalePiglets,
-        body.numberDeadPiglets,
-        body.averageLiterWeight
+        body.sowReproductiveHistory
       ),
     ];
   }
