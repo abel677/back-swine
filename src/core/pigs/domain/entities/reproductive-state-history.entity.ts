@@ -12,18 +12,17 @@ interface ReproductiveHistoryProps {
 }
 
 interface CreateReproductiveHistoryProps
-  extends Omit<ReproductiveHistoryProps, "sequential" | "birth"> {}
+  extends Omit<ReproductiveHistoryProps,"birth"> {}
 
 export class ReproductiveHistory {
   private constructor(
     public readonly id: string,
-    public readonly props: ReproductiveHistoryProps
+    private readonly props: ReproductiveHistoryProps
   ) {}
 
   static create(props: CreateReproductiveHistoryProps) {
     return new ReproductiveHistory(crypto.randomUUID(), {
       ...props,
-      sequential: 1,
       birth: null,
     });
   }
@@ -36,7 +35,7 @@ export class ReproductiveHistory {
   }
 
   addBirth(birth: Birth) {
-    this.props.birth = (birth);
+    this.props.birth = birth;
   }
 
   get sequential() {

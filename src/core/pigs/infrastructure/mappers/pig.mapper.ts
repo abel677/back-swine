@@ -119,7 +119,7 @@ export class PigMapper {
         ReproductiveHistoryMapper.fromPersistenceToDomain(r)
       ),
       currentSowReproductiveHistory:
-        data.sowReproductiveHistory?.length > 1
+        data.sowReproductiveHistory?.length > 0
           ? ReproductiveHistoryMapper.fromPersistenceToDomain(
               data.sowReproductiveHistory[0]
             )

@@ -13,7 +13,6 @@ import {
   PigPhase,
   PigReproductiveState,
   PigSex,
-  PigState,
   PigType,
 } from "../../../shared/domain/enums";
 import { PigMapper } from "../../infrastructure/mappers/pig.mapper";
@@ -133,6 +132,7 @@ export class CreatePigUseCase {
         endDate: endDate,
         reproductiveState,
         boarId: boar ? boar.id : undefined,
+        sequential: 1,
       });
 
       // crear registro de parto
