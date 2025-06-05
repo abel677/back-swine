@@ -22,27 +22,30 @@ export class UpdatePigDto {
       quantity?: number;
       price?: number;
       date?: string;
-      observation?: number;
+      observation?: string;
     }[],
     public readonly sowReproductiveHistory?: {
       id?: string;
-      reproductiveStateId?: string;
-      startDate?: Date;
-      numberMalePiglets?: number;
-      numberFemalePiglets?: number;
-      numberDeadPiglets?: number;
-      averageLiterWeight?: number;
+      reproductiveState?: {
+        id?: string;
+        name?: string;
+      };
+      startDate?: string;
       boarId?: string;
+      birth?: {
+        malePiglets?: number;
+        femalePiglets?: number;
+        deadPiglets?: number;
+        averageLitterWeight?: number;
+      };
     }[]
   ) {}
 
   static create(body: { [key: string]: any }): [string?, UpdatePigDto?] {
-    // Validación de farmId
     if (body.farmId && !Validators.isValidUUID(body.farmId)) {
       return ["farmId: ID de granja inválido o faltante."];
     }
 
-    // Validación de type
     if (body.type && !Object.values(PigType).includes(body.type)) {
       return [
         `type: Tipo de cerdo inválido. Valores permitidos: ${Object.values(
@@ -51,7 +54,6 @@ export class UpdatePigDto {
       ];
     }
 
-    // Validación de sex
     if (body.sex && !Object.values(PigSex).includes(body.sex)) {
       return [
         `sex: Sexo del cerdo inválido. Valores permitidos: ${Object.values(
@@ -60,17 +62,14 @@ export class UpdatePigDto {
       ];
     }
 
-    // Validación de phaseId
     if (body.phaseId && !Validators.isValidUUID(body.phaseId)) {
       return ["phaseId: ID de fase inválido."];
     }
 
-    // Validación de breedId
     if (body.breedId && !Validators.isValidUUID(body.breedId)) {
       return ["breedId: ID de raza inválido."];
     }
 
-    // Validación de code
     if (
       body.code &&
       typeof body.code === "string" &&
@@ -81,9 +80,8 @@ export class UpdatePigDto {
       ];
     }
 
-    // Validación de ageDays
     if (
-      body.ageDays &&
+      body.ageDays !== undefined &&
       (typeof body.ageDays !== "number" ||
         body.ageDays < 0 ||
         !Number.isInteger(body.ageDays))
@@ -91,9 +89,8 @@ export class UpdatePigDto {
       return ["ageDays: Edad en días inválida. Debe ser un entero positivo."];
     }
 
-    // Validación de initialPrice
     if (
-      body.initialPrice &&
+      body.initialPrice !== undefined &&
       (typeof body.initialPrice !== "number" || body.initialPrice < 0)
     ) {
       return [
@@ -101,16 +98,14 @@ export class UpdatePigDto {
       ];
     }
 
-    // Validación de weights (array de objetos {id?, days, weight})
     if (body.weights) {
       if (!Array.isArray(body.weights)) {
         return ["weights: Debe ser un array de objetos {id?, days, weight}"];
       }
 
       for (const weight of body.weights) {
-        // Validar days
         if (
-          weight.days &&
+          weight.days !== undefined &&
           (typeof weight.days !== "number" ||
             weight.days < 0 ||
             !Number.isInteger(weight.days))
@@ -118,9 +113,8 @@ export class UpdatePigDto {
           return ["weights: El campo 'days' debe ser un entero positivo"];
         }
 
-        // Validar weight
         if (
-          weight.weight &&
+          weight.weight !== undefined &&
           (typeof weight.weight !== "number" || weight.weight <= 0)
         ) {
           return [
@@ -130,7 +124,6 @@ export class UpdatePigDto {
       }
     }
 
-    // Validación de pigProduct (array de objetos {})
     if (body.pigProducts) {
       if (!Array.isArray(body.pigProducts)) {
         return [
@@ -143,38 +136,40 @@ export class UpdatePigDto {
           return ["productId: ID inválido o faltante."];
         }
         if (
-          product.quantity &&
+          product.quantity !== undefined &&
           (typeof product.quantity !== "number" || product.quantity <= 0)
         ) {
-          return ["quantity: Precio inválido o faltante."];
+          return ["quantity: Cantidad inválida o faltante."];
         }
         if (
-          product.price &&
+          product.price !== undefined &&
           (typeof product.price !== "number" || product.price <= 0)
         ) {
           return ["price: Precio inválido o faltante."];
         }
-        if (body.date && !Validators.date.test(product.date)) {
+        if (product.date && !Validators.date.test(product.date)) {
           return ["date: Fecha inválida o faltante."];
+        }
+        if (product.observation && typeof product.observation !== "string") {
+          return ["observation: Debe ser una cadena de texto."];
         }
       }
     }
 
-    // Datos reproductivos
-
     if (body.sowReproductiveHistory) {
       if (!Array.isArray(body.sowReproductiveHistory)) {
         return [
-          "sowReproductiveHistory: Debe ser un array de objetos {id?, reproductiveStateId?, startDate?, numberMalePiglets?, numberFemalePiglets?, numberDeadPiglets?, averageLiterWeight?, boarId?}",
+          "sowReproductiveHistory: Debe ser un array de objetos {id?, reproductiveState?, startDate?, boarId?, birth?}",
         ];
       }
 
       for (const history of body.sowReproductiveHistory) {
         if (
-          history.reproductiveStateId &&
-          !Validators.isValidUUID(history.reproductiveStateId)
+          history.reproductiveState &&
+          history.reproductiveState.id &&
+          !Validators.isValidUUID(history.reproductiveState.id)
         ) {
-          return ["reproductiveStateId: ID de estado reproductivo inválido."];
+          return ["reproductiveState: ID de estado reproductivo inválido."];
         }
 
         if (history.startDate && !Validators.date.test(history.startDate)) {
@@ -183,53 +178,56 @@ export class UpdatePigDto {
           ];
         }
 
-        if (
-          (history.numberFemalePiglets &&
-            typeof history.numberFemalePiglets !== "number") ||
-          history.numberFemalePiglets < 0
-        ) {
-          return [
-            "numberFemalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido.",
-          ];
-        }
-
-        if (
-          (history.numberMalePiglets &&
-            typeof history.numberMalePiglets !== "number") ||
-          history.numberMalePiglets < 0
-        ) {
-          return [
-            "numberMalePiglets: Número de lechones machos vivos obligatorio y debe ser válido.",
-          ];
-        }
-
-        if (
-          (history.numberDeadPiglets &&
-            typeof history.numberDeadPiglets !== "number") ||
-          history.numberDeadPiglets < 0
-        ) {
-          return [
-            "numberDeadPiglets: Número de lechones muertos obligatorio y debe ser válido.",
-          ];
-        }
-
-        if (
-          (history.averageLiterWeight &&
-            typeof history.averageLiterWeight !== "number") ||
-          history.averageLiterWeight < 0
-        ) {
-          return [
-            "averageLiterWeight: Peso promedio de la camada obligatorio y debe ser válido.",
-          ];
-        }
-
         if (history.boarId && !Validators.isValidUUID(history.boarId)) {
           return ["boarId: ID cerdo reproductor inválido."];
         }
+
+        if (history.birth) {
+          const {
+            malePiglets,
+            femalePiglets,
+            deadPiglets,
+            averageLitterWeight,
+          } = history.birth;
+
+          if (
+            femalePiglets !== undefined &&
+            (typeof femalePiglets !== "number" || femalePiglets < 0)
+          ) {
+            return [
+              "femalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido.",
+            ];
+          }
+
+          if (
+            malePiglets !== undefined &&
+            (typeof malePiglets !== "number" || malePiglets < 0)
+          ) {
+            return [
+              "malePiglets: Número de lechones machos vivos obligatorio y debe ser válido.",
+            ];
+          }
+
+          if (
+            deadPiglets !== undefined &&
+            (typeof deadPiglets !== "number" || deadPiglets < 0)
+          ) {
+            return [
+              "deadPiglets: Número de lechones muertos obligatorio y debe ser válido.",
+            ];
+          }
+
+          if (
+            averageLitterWeight !== undefined &&
+            (typeof averageLitterWeight !== "number" || averageLitterWeight < 0)
+          ) {
+            return [
+              "averageLitterWeight: Peso promedio de la camada obligatorio y debe ser válido.",
+            ];
+          }
+        }
       }
     }
-
-
 
     return [
       undefined,

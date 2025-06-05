@@ -162,7 +162,7 @@ export class UpdatePigUseCase {
         const nextState =
           await this.reproductiveStateRepository.getByIdAndUserId({
             userId,
-            id: sowHistory.reproductiveStateId,
+            id: sowHistory.reproductiveState?.id,
           });
         if (!nextState) {
           throw ApiError.notFound("Estado reproductivo no encontrado.");
@@ -170,15 +170,15 @@ export class UpdatePigUseCase {
         const reproductiveState = nextState.name as PigReproductiveState;
 
         // validar transacción de un estado a otro
-        if (
-          !ALLOWED_TRANSITIONS[
-            currentState?.name || PigReproductiveState.Rest
-          ].includes(nextState.name)
-        ) {
-          throw ApiError.badRequest(
-            `Transición no permitida de ${currentState?.name} a ${nextState.name}`
-          );
-        }
+        // if (
+        //   !ALLOWED_TRANSITIONS[
+        //     currentState?.name || PigReproductiveState.Rest
+        //   ].includes(nextState.name)
+        // ) {
+        //   throw ApiError.badRequest(
+        //     `Transición no permitida de ${currentState?.name} a ${nextState.name}`
+        //   );
+        // }
 
         // validar si hay un cerdo reproductor si el estado reproductivo = inseminación | gestación | lactancia
         let boar: Pig;
@@ -203,14 +203,18 @@ export class UpdatePigUseCase {
           }
         }
 
+        const startDate = sowHistory.startDate
+          ? new Date(sowHistory.startDate)
+          : new Date();
+
         const { endDate } = await this.pigCalculatorUseCase.execute(
           pig.farm.id,
           nextState.name as PigReproductiveState,
-          sowHistory.startDate
+          startDate
         );
 
         const history = ReproductiveHistory.create({
-          startDate: sowHistory.startDate,
+          startDate: startDate,
           endDate: endDate,
           reproductiveState: nextState,
           sowId: pig.id,
@@ -218,15 +222,15 @@ export class UpdatePigUseCase {
         });
 
         if (reproductiveState === PigReproductiveState.Lactation) {
-          this.validateBirthData(sowHistory);
+          this.validateBirthData(sowHistory.birth);
 
           const birth = Birth.create({
             reproductiveHistoryId: history.id,
-            birthDate: sowHistory.startDate,
-            malePiglets: sowHistory.numberMalePiglets,
-            femalePiglets: sowHistory.numberFemalePiglets,
-            deadPiglets: sowHistory.numberDeadPiglets,
-            averageLitterWeight: sowHistory.averageLiterWeight,
+            birthDate: startDate,
+            malePiglets: sowHistory.birth.malePiglets,
+            femalePiglets: sowHistory.birth.femalePiglets,
+            deadPiglets: sowHistory.birth.deadPiglets,
+            averageLitterWeight: sowHistory.birth.averageLitterWeight,
           });
           history.saveBirth(birth);
 
@@ -262,11 +266,11 @@ export class UpdatePigUseCase {
           // crear registros para los lechones
           const pigletsConfig = [
             {
-              count: sowHistory.numberFemalePiglets,
+              count: sowHistory.birth.femalePiglets,
               sex: PigSex.Female,
             },
             {
-              count: sowHistory.numberMalePiglets,
+              count: sowHistory.birth.malePiglets,
               sex: PigSex.Male,
             },
           ];
@@ -319,45 +323,43 @@ export class UpdatePigUseCase {
   };
   private validateBirthData(dto: {
     startDate?: Date;
-    numberMalePiglets?: number;
-    numberFemalePiglets?: number;
-    numberDeadPiglets?: number;
-    averageLiterWeight?: number;
+    malePiglets?: number;
+    femalePiglets?: number;
+    deadPiglets?: number;
+    averageLitterWeight?: number;
     boarId?: string;
   }) {
     if (
-      typeof dto.numberFemalePiglets !== "number" ||
-      dto.numberFemalePiglets < 0
+      typeof dto.femalePiglets !== "number" ||
+      dto.femalePiglets < 0
     ) {
       throw ApiError.badRequest(
-        "numberFemalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido."
+        "femalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido."
       );
     }
 
     if (
-      typeof dto.numberMalePiglets !== "number" ||
-      dto.numberMalePiglets < 0
+      typeof dto.malePiglets !== "number" ||
+      dto.malePiglets < 0
     ) {
       throw ApiError.badRequest(
-        "numberMalePiglets: Número de lechones machos vivos obligatorio y debe ser válido."
+        "malePiglets: Número de lechones machos vivos obligatorio y debe ser válido."
       );
     }
 
     if (
-      typeof dto.numberDeadPiglets !== "number" ||
-      dto.numberDeadPiglets < 0
+      typeof dto.deadPiglets !== "number" ||
+      dto.deadPiglets < 0
     ) {
       throw ApiError.badRequest(
-        "numberDeadPiglets: Número de lechones muertos obligatorio y debe ser válido."
+        "deadPiglets: Número de lechones muertos obligatorio y debe ser válido."
       );
     }
+console.log(dto);
 
-    if (
-      typeof dto.averageLiterWeight !== "number" ||
-      dto.averageLiterWeight < 0
-    ) {
+    if (typeof dto.averageLitterWeight !== "number" || dto.averageLitterWeight < 0) {
       throw ApiError.badRequest(
-        "averageLiterWeight: Peso promedio de la camada obligatorio y debe ser válido."
+        "averageLitterWeight: Peso promedio de la camada obligatorio y debe ser válido."
       );
     }
   }
