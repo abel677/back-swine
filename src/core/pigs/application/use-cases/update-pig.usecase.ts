@@ -329,35 +329,28 @@ export class UpdatePigUseCase {
     averageLitterWeight?: number;
     boarId?: string;
   }) {
-    if (
-      typeof dto.femalePiglets !== "number" ||
-      dto.femalePiglets < 0
-    ) {
+    if (typeof dto.femalePiglets !== "number" || dto.femalePiglets < 0) {
       throw ApiError.badRequest(
         "femalePiglets: Número de lechones hembras vivas obligatorio y debe ser válido."
       );
     }
 
-    if (
-      typeof dto.malePiglets !== "number" ||
-      dto.malePiglets < 0
-    ) {
+    if (typeof dto.malePiglets !== "number" || dto.malePiglets < 0) {
       throw ApiError.badRequest(
         "malePiglets: Número de lechones machos vivos obligatorio y debe ser válido."
       );
     }
 
-    if (
-      typeof dto.deadPiglets !== "number" ||
-      dto.deadPiglets < 0
-    ) {
+    if (typeof dto.deadPiglets !== "number" || dto.deadPiglets < 0) {
       throw ApiError.badRequest(
         "deadPiglets: Número de lechones muertos obligatorio y debe ser válido."
       );
     }
-console.log(dto);
 
-    if (typeof dto.averageLitterWeight !== "number" || dto.averageLitterWeight < 0) {
+    if (
+      typeof dto.averageLitterWeight !== "number" ||
+      dto.averageLitterWeight < 0
+    ) {
       throw ApiError.badRequest(
         "averageLitterWeight: Peso promedio de la camada obligatorio y debe ser válido."
       );
