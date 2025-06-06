@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsnd --respawn --clear src/main.ts",
-    "build": "prisma generate && rimraf ./dist && tsc",
+   "build": "prisma generate && rimraf ./dist && tsc && xcopy src\\views dist\\views /E /I /Y",
     "start": "npm run build && node dist/main.js",
     "migrate:deploy": "npx prisma migrate deploy",
     "postinstall": "npm run migrate:deploy"
