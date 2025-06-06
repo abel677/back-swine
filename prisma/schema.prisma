@@ -216,7 +216,7 @@ model Birth {
   isLitterWeaned        Boolean  @default(false)
   createdAt             DateTime
   updatedAt             DateTime
-  description           String   @db.LongText
+  description           String?   @db.LongText
 
   piglets             Pig[]               @relation("BirthPiglets")
   reproductiveHistory ReproductiveHistory @relation("ReproductiveHistoryBirth", fields: [reproductiveHistoryId], references: [id], onDelete: Cascade)

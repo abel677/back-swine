@@ -162,6 +162,7 @@ export class CreatePigUseCase {
           femalePiglets: sowHistory.birthPayload.femalePiglets,
           deadPiglets: sowHistory.birthPayload.deadPiglets,
           averageLitterWeight: sowHistory.birthPayload.averageLitterWeight,
+          description: sowHistory.birthPayload.description
         });
         history.saveBirth(birth);
 
