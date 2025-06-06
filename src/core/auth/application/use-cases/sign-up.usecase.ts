@@ -31,9 +31,7 @@ export class SignUpUseCase {
 
     const alreadyExist = await this.userRepository.getByEmail(dto.email);
     if (alreadyExist) {
-      throw ApiError.badRequest(
-        "Por favor revise su bandeja de entrada y siga las instrucciones para validar su cuenta."
-      );
+      return this.sendEmail(alreadyExist);
     }
 
     const passwordHashed = await this.hashService.hash(dto.password);
@@ -54,7 +52,10 @@ export class SignUpUseCase {
       name: dto.email,
       ownerId: user.id,
     });
+    return this.sendEmail(user);
+  }
 
+  private async sendEmail(user: User) {
     try {
       const verificationLink = `${DOMAIN}/auth/verify/${user.verificationToken}`;
       const templatePath =

@@ -24,9 +24,14 @@ export class CreateReproductiveStateUseCase {
         "Ya existe un estado reproductivo con el mismo nombre."
       );
     }
+    const reproductiveStates = await this.reproductiveStateRepository.getAll(
+      userId
+    );
     const reproductiveState = ReproductiveState.create({
       farmId: dto.farmId,
       name: dto.name,
+      order:
+        reproductiveStates.length > 0 ? reproductiveStates[0].order + 1 : 1,
     });
     await this.reproductiveStateRepository.create(reproductiveState);
 

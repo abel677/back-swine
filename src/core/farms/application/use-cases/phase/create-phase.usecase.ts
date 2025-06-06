@@ -14,9 +14,11 @@ export class CreatePhaseUseCase {
     if (alreadyExist) {
       throw ApiError.badRequest("Ya existe una fase con el mismo nombre.");
     }
+    const phases = await this.phaseRepository.getAll(userId);
     const phase = Phase.create({
       farmId: dto.farmId,
       name: dto.name,
+      order: phases.length > 0 ? phases[0].order + 1 : 1,
     });
     await this.phaseRepository.create(phase);
 

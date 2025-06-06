@@ -173,6 +173,7 @@ export class PigMapper {
                   isLitterWeaned: history.birth.isLitterWeaned,
                   createdAt: history.birth.createdAt,
                   updatedAt: history.birth.updatedAt,
+                  description: history.birth.description,
                   piglets: {
                     create: history.birth.piglets.map((piglet) => ({
                       id: piglet.id,
@@ -299,6 +300,7 @@ export class PigMapper {
                       averageLitterWeight: history.birth.averageLitterWeight,
                       isLitterWeaned: history.birth.isLitterWeaned,
                       updatedAt: history.birth.updatedAt,
+                      description: history.birth.description,
                       piglets: {
                         upsert: history.birth.piglets?.map((piglet) => ({
                           where: { id: piglet.id },
@@ -364,6 +366,7 @@ export class PigMapper {
                       isLitterWeaned: history.birth.isLitterWeaned,
                       createdAt: history.birth.createdAt,
                       updatedAt: history.birth.updatedAt,
+                      description: history.birth.description,
                       piglets: {
                         create: history.birth.piglets.map((piglet) => ({
                           id: piglet.id,

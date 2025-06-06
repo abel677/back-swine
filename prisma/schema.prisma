@@ -56,14 +56,14 @@ model Notification {
   dateSent    DateTime
   isRead      Boolean
   farmId      String
-  farm        Farm     @relation(fields: [farmId], references: [id])
+  farm        Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
 }
 
 model Farm {
   id                 String              @unique @default(uuid())
   name               String
   ownerId            String
-  owner              User                @relation(fields: [ownerId], references: [id])
+  owner              User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt          DateTime
   updatedAt          DateTime
   breeds             Breed[]
@@ -82,7 +82,7 @@ model Breed {
   id        String   @unique @default(uuid())
   name      String
   farmId    String
-  farm      Farm     @relation(fields: [farmId], references: [id])
+  farm      Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
   createdAt DateTime
   updatedAt DateTime
   pigs      Pig[]
@@ -92,7 +92,8 @@ model ReproductiveState {
   id                  String                @unique @default(uuid())
   name                String
   farmId              String
-  farm                Farm                  @relation(fields: [farmId], references: [id])
+  order               Int
+  farm                Farm                  @relation(fields: [farmId], references: [id], onDelete: Cascade)
   createdAt           DateTime
   updatedAt           DateTime
   reproductiveHistory ReproductiveHistory[]
@@ -102,7 +103,8 @@ model Phase {
   id        String   @unique @default(uuid())
   name      String
   farmId    String
-  farm      Farm     @relation(fields: [farmId], references: [id])
+  order     Int
+  farm      Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
   createdAt DateTime
   updatedAt DateTime
   pigs      Pig[]
@@ -112,7 +114,7 @@ model Category {
   id        String    @unique @default(uuid())
   name      String
   farmId    String
-  farm      Farm      @relation(fields: [farmId], references: [id])
+  farm      Farm      @relation(fields: [farmId], references: [id], onDelete: Cascade)
   createdAt DateTime
   updatedAt DateTime
   products  Product[]
@@ -125,8 +127,8 @@ model Product {
   price       Decimal      @db.Decimal(10, 3)
   farmId      String
   categoryId  String
-  farm        Farm         @relation(fields: [farmId], references: [id])
-  category    Category     @relation(fields: [categoryId], references: [id])
+  farm        Farm         @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime
   updatedAt   DateTime
   pigs        PigProduct[]
@@ -214,6 +216,7 @@ model Birth {
   isLitterWeaned        Boolean  @default(false)
   createdAt             DateTime
   updatedAt             DateTime
+  description           String   @db.LongText
 
   piglets             Pig[]               @relation("BirthPiglets")
   reproductiveHistory ReproductiveHistory @relation("ReproductiveHistoryBirth", fields: [reproductiveHistoryId], references: [id], onDelete: Cascade)

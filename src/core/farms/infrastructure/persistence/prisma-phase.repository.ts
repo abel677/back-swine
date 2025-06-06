@@ -41,7 +41,7 @@ export class PrismaPhaseRepository implements PhaseRepository {
         },
       },
       orderBy: {
-        updatedAt: "desc",
+        order: "asc",
       },
     });
     return entities.map((entity) => PhaseMapper.toDomain(entity));

@@ -5,6 +5,7 @@ export class ReproductiveState {
     public readonly id: string,
     public readonly farmId: string,
     private _name: string,
+    private _order: number,
     public readonly createdAt: Date,
     private _updatedAt: Date
   ) {}
@@ -13,6 +14,9 @@ export class ReproductiveState {
     return this._updatedAt;
   }
 
+  get order() {
+    return this._order;
+  }
   get name() {
     return this._name;
   }
@@ -22,7 +26,7 @@ export class ReproductiveState {
     this._updatedAt = DomainDateTime.now();
   }
 
-  static create(props: { farmId: string; name: string }) {
+  static create(props: { farmId: string; name: string; order: number }) {
     const id = crypto.randomUUID();
     const currentDate = DomainDateTime.now();
 
@@ -30,6 +34,7 @@ export class ReproductiveState {
       id,
       props.farmId,
       props.name,
+      props.order,
       currentDate,
       currentDate
     );
@@ -39,6 +44,7 @@ export class ReproductiveState {
     id: string;
     farmId: string;
     name: string;
+    order: number;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -46,6 +52,7 @@ export class ReproductiveState {
       props.id,
       props.farmId,
       props.name,
+      props.order,
       props.createdAt,
       props.updatedAt
     );

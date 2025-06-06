@@ -6,6 +6,7 @@ export class PhaseMapper {
     return {
       id: phase.id,
       name: phase.name,
+      order: phase.order,
       farmId: phase.farmId,
       createdAt: phase.createdAt,
       updatedAt: phase.updatedAt,
@@ -16,6 +17,7 @@ export class PhaseMapper {
     return Phase.fromPrimitives({
       id: data.id,
       name: data.name,
+      order: data.order,
       farmId: data.farmId,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -26,6 +28,7 @@ export class PhaseMapper {
     return {
       id: phase.id,
       name: phase.name,
+      order: phase.order,
       farm: {
         connect: { id: phase.farmId },
       },
@@ -40,6 +43,7 @@ export class PhaseMapper {
     return phases.map((phase) => ({
       name: phase.name,
       farmId: phase.farmId,
+      order: phase.order,
       createdAt: phase.createdAt,
       updatedAt: phase.updatedAt,
     }));

@@ -15,8 +15,21 @@ export class AuthController {
 
   verify = async (req: Request, res: Response) => {
     const token = req.params.token;
-    const result = await this.verifyAccountUseCase.execute(token);
-    return res.status(200).send(result);
+    try {
+      await this.verifyAccountUseCase.execute(token);
+      res.render("verify-success", {
+        redirectUrl: "swine.management.app://auth/login",
+        heading: "¡Cuenta verificada!",
+        message: "Tu cuenta fue verificada con éxito.",
+        title: "Verificación Exitosa",
+      });
+    } catch (error) {
+      res.render("verify-error", {
+        title: "Verificación Fallida",
+        heading: "¡Cuenta No verificada!",
+        message: "No se pudo verificar tu cuenta.",
+      });
+    }
   };
 
   signIn = async (req: Request, res: Response) => {

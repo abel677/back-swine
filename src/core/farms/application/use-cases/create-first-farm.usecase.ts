@@ -71,26 +71,32 @@ export class CreateFirstFarmUseCase {
       ReproductiveState.create({
         farmId: farm.id,
         name: "Celo",
+        order: 1,
       }),
       ReproductiveState.create({
         farmId: farm.id,
         name: "Inseminación",
+        order: 2,
       }),
       ReproductiveState.create({
         farmId: farm.id,
         name: "Gestación",
+        order: 3,
       }),
       ReproductiveState.create({
         farmId: farm.id,
         name: "Lactancia",
+        order: 4,
       }),
       ReproductiveState.create({
         farmId: farm.id,
         name: "Destete",
+        order: 5,
       }),
       ReproductiveState.create({
         farmId: farm.id,
         name: "Descanso",
+        order: 6,
       }),
     ];
 
@@ -100,26 +106,32 @@ export class CreateFirstFarmUseCase {
       Phase.create({
         farmId: farm.id,
         name: "Neonatal",
+        order: 1,
       }),
       Phase.create({
         farmId: farm.id,
         name: "Destete",
+        order: 2,
       }),
       Phase.create({
         farmId: farm.id,
         name: "Inicial",
+        order: 3,
       }),
       Phase.create({
         farmId: farm.id,
         name: "Crecimiento",
+        order: 4,
       }),
       Phase.create({
         farmId: farm.id,
         name: "Engorde",
+        order: 5,
       }),
       Phase.create({
         farmId: farm.id,
         name: "Finalizado",
+        order: 6,
       }),
     ];
     await this.phaseRepository.createMany(phases);

@@ -12,6 +12,7 @@ export interface BirthProps {
   averageLitterWeight: number;
 
   // no obligatorios para creación
+  description?: string;
   numberBirth: number;
   isLitterWeaned: boolean;
   piglets: Pig[];
@@ -96,6 +97,9 @@ export class Birth {
 
   get reproductiveHistoryId() {
     return this.props.reproductiveHistoryId;
+  }
+  get description() {
+    return this.props.description;
   }
   get numberBirth() {
     return this.props.numberBirth;

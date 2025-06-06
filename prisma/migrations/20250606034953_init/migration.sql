@@ -12,7 +12,6 @@ CREATE TABLE `Plan` (
 -- CreateTable
 CREATE TABLE `User` (
     `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `isOwner` BOOLEAN NOT NULL,
@@ -23,7 +22,6 @@ CREATE TABLE `User` (
     `state` BOOLEAN NOT NULL,
 
     UNIQUE INDEX `User_id_key`(`id`),
-    UNIQUE INDEX `User_name_key`(`name`),
     UNIQUE INDEX `User_email_key`(`email`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -86,6 +84,7 @@ CREATE TABLE `ReproductiveState` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `farmId` VARCHAR(191) NOT NULL,
+    `order` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -97,6 +96,7 @@ CREATE TABLE `Phase` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `farmId` VARCHAR(191) NOT NULL,
+    `order` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -176,8 +176,10 @@ CREATE TABLE `Birth` (
     `isLitterWeaned` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
+    `description` LONGTEXT NOT NULL,
 
-    UNIQUE INDEX `Birth_id_key`(`id`)
+    UNIQUE INDEX `Birth_id_key`(`id`),
+    UNIQUE INDEX `Birth_reproductiveHistoryId_key`(`reproductiveHistoryId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -198,6 +200,7 @@ CREATE TABLE `PigProduct` (
     `pigId` VARCHAR(191) NOT NULL,
     `productId` VARCHAR(191) NOT NULL,
     `quantity` DECIMAL(10, 3) NOT NULL,
+    `price` DECIMAL(10, 3) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -234,28 +237,28 @@ ALTER TABLE `FarmUser` ADD CONSTRAINT `FarmUser_farmId_fkey` FOREIGN KEY (`farmI
 ALTER TABLE `FarmUser` ADD CONSTRAINT `FarmUser_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Notification` ADD CONSTRAINT `Notification_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Notification` ADD CONSTRAINT `Notification_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Farm` ADD CONSTRAINT `Farm_ownerId_fkey` FOREIGN KEY (`ownerId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Farm` ADD CONSTRAINT `Farm_ownerId_fkey` FOREIGN KEY (`ownerId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Breed` ADD CONSTRAINT `Breed_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Breed` ADD CONSTRAINT `Breed_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ReproductiveState` ADD CONSTRAINT `ReproductiveState_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ReproductiveState` ADD CONSTRAINT `ReproductiveState_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Phase` ADD CONSTRAINT `Phase_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Phase` ADD CONSTRAINT `Phase_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Category` ADD CONSTRAINT `Category_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Category` ADD CONSTRAINT `Category_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Product` ADD CONSTRAINT `Product_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Product` ADD CONSTRAINT `Product_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Product` ADD CONSTRAINT `Product_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Product` ADD CONSTRAINT `Product_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Pig` ADD CONSTRAINT `Pig_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -291,10 +294,10 @@ ALTER TABLE `Birth` ADD CONSTRAINT `Birth_reproductiveHistoryId_fkey` FOREIGN KE
 ALTER TABLE `PigWeight` ADD CONSTRAINT `PigWeight_pigId_fkey` FOREIGN KEY (`pigId`) REFERENCES `Pig`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `PigProduct` ADD CONSTRAINT `PigProduct_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `PigProduct` ADD CONSTRAINT `PigProduct_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `PigProduct` ADD CONSTRAINT `PigProduct_pigId_fkey` FOREIGN KEY (`pigId`) REFERENCES `Pig`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `PigProduct` ADD CONSTRAINT `PigProduct_pigId_fkey` FOREIGN KEY (`pigId`) REFERENCES `Pig`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Setting` ADD CONSTRAINT `Setting_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

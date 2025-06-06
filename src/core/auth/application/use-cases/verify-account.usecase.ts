@@ -1,4 +1,5 @@
 import { ApiError } from "../../../shared/exceptions/custom-error";
+import { UserResponseDto } from "../../../users/application/dtos/user-response.dto";
 import { UserRepository } from "../../../users/domain/contracts/user.repository";
 
 export class VerifyAccountUseCase {
@@ -15,7 +16,8 @@ export class VerifyAccountUseCase {
     await this.userRepository.update(user);
 
     return {
-      message: "Cuenta verifica con exito. Ya puede iniciar sesión.",
+      token: token,
+      user: UserResponseDto.toHttpResponse(user),
     };
   }
 }

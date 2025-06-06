@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { errorHandler } from "./middlewares/handler-errors.middleware";
+import path from "path";
 
 interface Options {
   port?: number;
@@ -24,6 +25,9 @@ export class Server {
   }
 
   private setupMiddlewares() {
+    this.app.set("view engine", "ejs");
+    this.app.set("views", path.join(__dirname, "..", "..", "views"));
+
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cors());

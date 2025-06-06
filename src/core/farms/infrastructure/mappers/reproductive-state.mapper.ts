@@ -6,6 +6,7 @@ export class ReproductiveStateMapper {
     return {
       id: reproductiveState.id,
       name: reproductiveState.name,
+      order: reproductiveState.order,
       farmId: reproductiveState.farmId,
       createdAt: reproductiveState.createdAt,
       updatedAt: reproductiveState.updatedAt,
@@ -17,6 +18,7 @@ export class ReproductiveStateMapper {
       id: data.id,
       name: data.name,
       farmId: data.farmId,
+      order: data.order,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     });
@@ -28,6 +30,7 @@ export class ReproductiveStateMapper {
     return {
       id: reproductiveState.id,
       name: reproductiveState.name,
+      order: reproductiveState.order,
       farm: {
         connect: { id: reproductiveState.farmId },
       },
@@ -41,6 +44,7 @@ export class ReproductiveStateMapper {
   ): Prisma.ReproductiveStateCreateManyInput[] {
     return reproductiveStates.map((reproductiveState) => ({
       name: reproductiveState.name,
+      order: reproductiveState.order,
       farmId: reproductiveState.farmId,
       createdAt: reproductiveState.createdAt,
       updatedAt: reproductiveState.updatedAt,

@@ -43,7 +43,7 @@ export class PrismaReproductiveStateRepository
         },
       },
       orderBy: {
-        updatedAt: "desc",
+        order: "asc",
       },
     });
     return entities.map((entity) => ReproductiveStateMapper.toDomain(entity));

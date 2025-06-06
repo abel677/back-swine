@@ -14,6 +14,7 @@ export class BirthMapper {
       piglets: birth.piglets?.map((p) => PigMapper.fromDomainToHttpResponse(p)),
       isLitterWeaned: birth.isLitterWeaned,
       reproductiveHistoryId: birth.reproductiveHistoryId,
+      description: birth.description ?? "",
       createdAt: birth.createdAt,
       updatedAt: birth.updatedAt,
     };
@@ -96,6 +97,7 @@ export class BirthMapper {
       isLitterWeaned: birth.isLitterWeaned,
       createdAt: birth.createdAt,
       updatedAt: birth.updatedAt,
+      description: birth.description,
       reproductiveHistory: {
         connect: {
           id: birth.reproductiveHistoryId,
@@ -118,6 +120,7 @@ export class BirthMapper {
       createdAt: birth.createdAt,
       updatedAt: birth.updatedAt,
       reproductiveHistoryId: birth.reproductiveHistoryId,
+      description: birth.description,
     }));
   }
 }

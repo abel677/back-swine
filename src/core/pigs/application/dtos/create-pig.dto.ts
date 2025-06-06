@@ -11,20 +11,19 @@ export class CreatePigDto {
     public readonly code: string,
     public readonly ageDays: number,
     public readonly initialPrice: number,
-    public readonly sowReproductiveHistory?: {
-      reproductiveState: {
-        id: string;
-        name: string;
-      };
+    public readonly sowReproductiveHistoryPayload?: {
+      reproductiveStateId: string;
       startDate: string;
-      boarId: string;
-      birth?: {
+      boarId?: string;
+      birthPayload?: {
         malePiglets: number;
         femalePiglets: number;
         deadPiglets: number;
         averageLitterWeight: number;
+        birthDate: string;
+        description?: string;
       };
-    }[]
+    }
   ) {}
 
   static create(body: { [key: string]: any }): [string?, CreatePigDto?] {
@@ -81,69 +80,58 @@ export class CreatePigDto {
     }
 
     // Validaciones de historial reproductivo (si aplica)
-    if (body.sowReproductiveHistory) {
-      if (!Array.isArray(body.sowReproductiveHistory)) {
-        return ["sowReproductiveHistory: Debe ser un arreglo de objetos."];
+    if (body.sowReproductiveHistoryPayload) {
+      const { reproductiveStateId, startDate, boarId, birthPayload } =
+        body.sowReproductiveHistoryPayload;
+
+      if (
+        !reproductiveStateId ||
+        !Validators.isValidUUID(reproductiveStateId)
+      ) {
+        return [
+          "sowReproductiveHistory.reproductiveStateId: ID estado reproductivo inválido o faltante.",
+        ];
       }
 
-      for (const history of body.sowReproductiveHistory) {
+      if (!Validators.date.test(startDate)) {
+        return ["sowReproductiveHistory.startDate: Fecha inválida o faltante."];
+      }
+
+      if (boarId && !Validators.isValidUUID(boarId)) {
+        return [
+          "sowReproductiveHistory.boarId: ID del cerdo reproductor inválido o faltante.",
+        ];
+      }
+
+      if (birthPayload) {
+        const { malePiglets, femalePiglets, deadPiglets, averageLitterWeight } =
+          birthPayload;
+
+        if (typeof malePiglets !== "number" || malePiglets < 0) {
+          return [
+            "birth.malePiglets: Número de lechones machos inválido o faltante.",
+          ];
+        }
+
+        if (typeof femalePiglets !== "number" || femalePiglets < 0) {
+          return [
+            "birth.femalePiglets: Número de lechones hembras inválido o faltante.",
+          ];
+        }
+
+        if (typeof deadPiglets !== "number" || deadPiglets < 0) {
+          return [
+            "birth.deadPiglets: Número de lechones muertos inválido o faltante.",
+          ];
+        }
 
         if (
-          !history.reproductiveState ||
-          !Validators.isValidUUID(history.reproductiveState.id) ||
-          typeof history.reproductiveState.name !== "string"
+          typeof averageLitterWeight !== "number" ||
+          averageLitterWeight < 0
         ) {
           return [
-            "sowReproductiveHistory.reproductiveState: Datos inválidos o faltantes.",
+            "birth.averageLitterWeight: Peso promedio inválido o faltante.",
           ];
-        }
-
-        if (!Validators.date.test(history.startDate)) {
-          return [
-            "sowReproductiveHistory.startDate: Fecha inválida o faltante.",
-          ];
-        }
-
-        if (!Validators.isValidUUID(history.boarId)) {
-          return [
-            "sowReproductiveHistory.boarId: ID del cerdo reproductor inválido o faltante.",
-          ];
-        }
-
-        if (history.birth) {
-          const {
-            malePiglets,
-            femalePiglets,
-            deadPiglets,
-            averageLitterWeight,
-          } = history.birth;
-
-          if (typeof malePiglets !== "number" || malePiglets < 0) {
-            return [
-              "birth.malePiglets: Número de lechones machos inválido o faltante.",
-            ];
-          }
-
-          if (typeof femalePiglets !== "number" || femalePiglets < 0) {
-            return [
-              "birth.femalePiglets: Número de lechones hembras inválido o faltante.",
-            ];
-          }
-
-          if (typeof deadPiglets !== "number" || deadPiglets < 0) {
-            return [
-              "birth.deadPiglets: Número de lechones muertos inválido o faltante.",
-            ];
-          }
-
-          if (
-            typeof averageLitterWeight !== "number" ||
-            averageLitterWeight < 0
-          ) {
-            return [
-              "birth.averageLitterWeight: Peso promedio inválido o faltante.",
-            ];
-          }
         }
       }
     }
@@ -159,7 +147,7 @@ export class CreatePigDto {
         body.code,
         body.ageDays,
         body.initialPrice,
-        body.sowReproductiveHistory
+        body.sowReproductiveHistoryPayload
       ),
     ];
   }
