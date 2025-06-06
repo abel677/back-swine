@@ -18,7 +18,6 @@ model Plan {
 
 model User {
   id                String     @unique @default(uuid())
-  //name              String     @unique
   email             String     @unique
   password          String
   isOwner           Boolean
@@ -172,18 +171,18 @@ model Pig {
   motherId String?
   fatherId String?
 
-  farm  Farm  @relation(fields: [farmId], references: [id])
-  breed Breed @relation(fields: [breedId], references: [id])
-  phase Phase @relation(fields: [phaseId], references: [id])
+  farm  Farm  @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  breed Breed @relation(fields: [breedId], references: [id], onDelete: Cascade)
+  phase Phase @relation(fields: [phaseId], references: [id], onDelete: Cascade)
 
   weights  PigWeight[]
   products PigProduct[]
 
-  mother            Pig?   @relation("MotherPig", fields: [motherId], references: [id])
-  father            Pig?   @relation("FatherPig", fields: [fatherId], references: [id])
+  mother            Pig?   @relation("MotherPig", fields: [motherId], references: [id], onDelete: SetNull)
+  father            Pig?   @relation("FatherPig", fields: [fatherId], references: [id], onDelete: SetNull)
   pigletsFromMother Pig[]  @relation("MotherPig")
   pigletsFromFather Pig[]  @relation("FatherPig")
-  birth             Birth? @relation("BirthPiglets", fields: [birthId], references: [id])
+  birth             Birth? @relation("BirthPiglets", fields: [birthId], references: [id], onDelete: Cascade)
 
   sowReproductiveHistory  ReproductiveHistory[] @relation("SowPig")
   boarReproductiveHistory ReproductiveHistory[] @relation("BoarPig")
