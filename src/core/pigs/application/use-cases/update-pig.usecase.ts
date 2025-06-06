@@ -5,6 +5,7 @@ import { PhaseRepository } from "../../../farms/domain/contracts/phase.repositor
 import { ReproductiveStateRepository } from "../../../farms/domain/contracts/reproductive-state.repository";
 import { SettingRepository } from "../../../farms/domain/contracts/setting.repository";
 import { CreateSowNotificationsUseCase } from "../../../notifications/application/use-cases/create-sow-notification.usecase";
+import { DeleteSowNotificationUseCase } from "../../../notifications/application/use-cases/delete-sow-notification.usecase";
 import { ProductRepository } from "../../../products/domain/contracts/product.repository";
 import { ALLOWED_TRANSITIONS } from "../../../shared/domain/allowed-transition";
 import {
@@ -34,6 +35,7 @@ export class UpdatePigUseCase {
     private readonly reproductiveStateRepository: ReproductiveStateRepository,
     private readonly pigCalculatorUseCase: PigReproductiveCalculatorUseCase,
     private readonly createSowNotificationUseCase: CreateSowNotificationsUseCase,
+    private readonly deleteSowNotificationUseCase: DeleteSowNotificationUseCase,
     private readonly settingRepository: SettingRepository
   ) {}
 
@@ -313,11 +315,23 @@ export class UpdatePigUseCase {
           });
           const currentSowReproductiveHistory =
             pig.currentSowReproductiveHistory;
+
           currentSowReproductiveHistory.birth.weanLitter(phasePiglet);
+
           pig.saveSowReproductiveHistory(currentSowReproductiveHistory);
         }
         history.saveSequential(pig.sowReproductiveHistory.length + 1);
         pig.saveSowReproductiveHistory(history);
+        await this.deleteSowNotificationUseCase.execute({
+          farmId: pig.farm.id,
+          code: pig.code,
+        });
+        await this.createSowNotificationUseCase.execute({
+          farmId: pig.farm.id,
+          code: pig.code,
+          reproductiveState: nextState.name as PigReproductiveState,
+          dateStart: history.startDate,
+        });
       }
     }
 

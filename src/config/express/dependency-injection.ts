@@ -190,6 +190,7 @@ const pigUseCases = {
     repositories.reproductiveStateRepository,
     pigReproductiveCalculatorUseCase,
     notificationUseCases.createSowNotifications,
+    notificationUseCases.deleteSowNotifications,
     repositories.settingRepository
   ),
   getAll: new GetAllPigUseCase(repositories.pigRepository),

@@ -43,7 +43,7 @@ export class CreateFirstFarmUseCase {
     const setting = Setting.create({
       farmId: farm.id,
       matingHeatDurationDays: 3,
-      inseminationDurationDays: 28,
+      inseminationDurationDays: 21,
       gestationDurationDays: 114,
       lactationDurationDays: 21,
       weaningDurationDays: 0,
@@ -139,7 +139,7 @@ export class CreateFirstFarmUseCase {
     const categories: Category[] = [
       Category.create({
         farmId: farm.id,
-        name: "Vacunas",
+        name: "Fármacos",
       }),
       Category.create({
         farmId: farm.id,

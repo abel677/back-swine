@@ -162,7 +162,7 @@ export class CreatePigUseCase {
           femalePiglets: sowHistory.birthPayload.femalePiglets,
           deadPiglets: sowHistory.birthPayload.deadPiglets,
           averageLitterWeight: sowHistory.birthPayload.averageLitterWeight,
-          description: sowHistory.birthPayload.description
+          description: sowHistory.birthPayload.description,
         });
         history.saveBirth(birth);
 
@@ -227,7 +227,12 @@ export class CreatePigUseCase {
           }
         });
       }
-      if (reproductiveState === PigReproductiveState.Weaning) {
+
+      // está buscando los lechones para marcar como destetado
+      if (
+        reproductiveState === PigReproductiveState.Weaning &&
+        sowHistory.boarId
+      ) {
         const phasePiglet = await this.phaseRepository.getByNameAndUserId({
           name: PigPhase.Weaning,
           userId: userId,
@@ -239,10 +244,15 @@ export class CreatePigUseCase {
       }
       history.saveSequential(newPig.sowReproductiveHistory.length + 1);
       newPig.saveSowReproductiveHistory(history);
+      await this.createSowNotificationUseCase.execute({
+        farmId: newPig.fatherId,
+        reproductiveState: nextState.name as PigReproductiveState,
+        code: newPig.code,
+        dateStart: history.startDate,
+      });
     }
 
     await this.pigRepository.create(newPig);
-
     return PigMapper.fromDomainToHttpResponse(newPig);
   }
 
