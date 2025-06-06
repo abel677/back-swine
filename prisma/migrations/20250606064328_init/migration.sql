@@ -176,7 +176,7 @@ CREATE TABLE `Birth` (
     `isLitterWeaned` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
-    `description` LONGTEXT NOT NULL,
+    `description` LONGTEXT NULL,
 
     UNIQUE INDEX `Birth_id_key`(`id`),
     UNIQUE INDEX `Birth_reproductiveHistoryId_key`(`reproductiveHistoryId`)
