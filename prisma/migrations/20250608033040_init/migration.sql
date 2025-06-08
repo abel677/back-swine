@@ -6,7 +6,7 @@ CREATE TABLE `Plan` (
     `maxUsersPerFarm` INTEGER NOT NULL,
     `price` DECIMAL(10, 3) NOT NULL,
 
-    UNIQUE INDEX `Plan_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -21,8 +21,8 @@ CREATE TABLE `User` (
     `updatedAt` DATETIME(3) NOT NULL,
     `state` BOOLEAN NOT NULL,
 
-    UNIQUE INDEX `User_id_key`(`id`),
-    UNIQUE INDEX `User_email_key`(`email`)
+    UNIQUE INDEX `User_email_key`(`email`),
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -31,8 +31,8 @@ CREATE TABLE `UserPlan` (
     `userId` VARCHAR(191) NOT NULL,
     `planId` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `UserPlan_id_key`(`id`),
-    UNIQUE INDEX `UserPlan_userId_key`(`userId`)
+    UNIQUE INDEX `UserPlan_userId_key`(`userId`),
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -41,7 +41,7 @@ CREATE TABLE `FarmUser` (
     `farmId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `FarmUser_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -54,7 +54,7 @@ CREATE TABLE `Notification` (
     `isRead` BOOLEAN NOT NULL,
     `farmId` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `Notification_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -65,7 +65,7 @@ CREATE TABLE `Farm` (
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `Farm_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -76,7 +76,7 @@ CREATE TABLE `Breed` (
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `Breed_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -100,7 +100,7 @@ CREATE TABLE `Phase` (
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `Phase_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -125,7 +125,7 @@ CREATE TABLE `Product` (
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `Product_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -147,7 +147,7 @@ CREATE TABLE `Pig` (
     `motherId` VARCHAR(191) NULL,
     `fatherId` VARCHAR(191) NULL,
 
-    UNIQUE INDEX `Pig_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -160,7 +160,7 @@ CREATE TABLE `ReproductiveHistory` (
     `startDate` DATETIME(3) NOT NULL,
     `endDate` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `ReproductiveHistory_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -178,8 +178,8 @@ CREATE TABLE `Birth` (
     `updatedAt` DATETIME(3) NOT NULL,
     `description` LONGTEXT NULL,
 
-    UNIQUE INDEX `Birth_id_key`(`id`),
-    UNIQUE INDEX `Birth_reproductiveHistoryId_key`(`reproductiveHistoryId`)
+    UNIQUE INDEX `Birth_reproductiveHistoryId_key`(`reproductiveHistoryId`),
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -191,7 +191,7 @@ CREATE TABLE `PigWeight` (
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `PigWeight_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -204,7 +204,7 @@ CREATE TABLE `PigProduct` (
     `createdAt` DATETIME(3) NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `PigProduct_id_key`(`id`)
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -261,13 +261,13 @@ ALTER TABLE `Product` ADD CONSTRAINT `Product_farmId_fkey` FOREIGN KEY (`farmId`
 ALTER TABLE `Product` ADD CONSTRAINT `Product_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Pig` ADD CONSTRAINT `Pig_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Pig` ADD CONSTRAINT `Pig_farmId_fkey` FOREIGN KEY (`farmId`) REFERENCES `Farm`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Pig` ADD CONSTRAINT `Pig_breedId_fkey` FOREIGN KEY (`breedId`) REFERENCES `Breed`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Pig` ADD CONSTRAINT `Pig_breedId_fkey` FOREIGN KEY (`breedId`) REFERENCES `Breed`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Pig` ADD CONSTRAINT `Pig_phaseId_fkey` FOREIGN KEY (`phaseId`) REFERENCES `Phase`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Pig` ADD CONSTRAINT `Pig_phaseId_fkey` FOREIGN KEY (`phaseId`) REFERENCES `Phase`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Pig` ADD CONSTRAINT `Pig_motherId_fkey` FOREIGN KEY (`motherId`) REFERENCES `Pig`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -276,7 +276,7 @@ ALTER TABLE `Pig` ADD CONSTRAINT `Pig_motherId_fkey` FOREIGN KEY (`motherId`) RE
 ALTER TABLE `Pig` ADD CONSTRAINT `Pig_fatherId_fkey` FOREIGN KEY (`fatherId`) REFERENCES `Pig`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Pig` ADD CONSTRAINT `Pig_birthId_fkey` FOREIGN KEY (`birthId`) REFERENCES `Birth`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Pig` ADD CONSTRAINT `Pig_birthId_fkey` FOREIGN KEY (`birthId`) REFERENCES `Birth`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ReproductiveHistory` ADD CONSTRAINT `ReproductiveHistory_sowId_fkey` FOREIGN KEY (`sowId`) REFERENCES `Pig`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

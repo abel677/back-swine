@@ -24,12 +24,12 @@ export class UpdatePigDto {
       date?: string;
       observation?: string;
     }[],
-    public readonly sowReproductiveHistoryPayload?: {
+    public readonly sowReproductiveHistory?: {
       id?: string;
       reproductiveStateId?: string;
       startDate?: string;
       boarId?: string;
-      birthPayload?: {
+      birth?: {
         malePiglets?: number;
         femalePiglets?: number;
         deadPiglets?: number;
@@ -37,7 +37,7 @@ export class UpdatePigDto {
         birthDate?: string;
         description?: string;
       };
-    }
+    }[]
   ) {}
 
   static create(body: { [key: string]: any }): [string?, UpdatePigDto?] {
@@ -155,78 +155,72 @@ export class UpdatePigDto {
       }
     }
 
-    // Validaciones de historial reproductivo (si aplica)
     if (body.sowReproductiveHistoryPayload) {
-      const sowReproductiveHistoryPayload = body.sowReproductiveHistoryPayload;
-
-      if (
-        sowReproductiveHistoryPayload.reproductiveStateId &&
-        !Validators.isValidUUID(
-          sowReproductiveHistoryPayload.reproductiveStateId
-        )
-      ) {
-        return [
-          "sowReproductiveHistory.reproductiveStateId: ID estado reproductivo inválido o faltante.",
-        ];
+      if (!Array.isArray(body.sowReproductiveHistoryPayload)) {
+        return ["sowReproductiveHistory: Debe ser un array de objetos válidos"];
       }
 
-      if (
-        sowReproductiveHistoryPayload.startDate &&
-        !Validators.date.test(sowReproductiveHistoryPayload.startDate)
-      ) {
-        return ["sowReproductiveHistory.startDate: Fecha inválida o faltante."];
-      }
-
-      if (
-        sowReproductiveHistoryPayload.boarId &&
-        !Validators.isValidUUID(sowReproductiveHistoryPayload.boarId)
-      ) {
-        return [
-          "sowReproductiveHistory.boarId: ID del cerdo reproductor inválido o faltante.",
-        ];
-      }
-
-      if (sowReproductiveHistoryPayload.birthPayload) {
-        const birthPayload = sowReproductiveHistoryPayload.birthPayload;
-
+      for (const entry of body.sowReproductiveHistoryPayload) {
         if (
-          (birthPayload.malePiglets &&
-            typeof birthPayload.malePiglets !== "number") ||
-          birthPayload.malePiglets < 0
+          entry.reproductiveStateId &&
+          !Validators.isValidUUID(entry.reproductiveStateId)
         ) {
           return [
-            "birth.malePiglets: Número de lechones machos inválido o faltante.",
+            "sowReproductiveHistory.reproductiveStateId: ID estado reproductivo inválido.",
           ];
         }
 
-        if (
-          (birthPayload.femalePiglets &&
-            typeof birthPayload.femalePiglets !== "number") ||
-          birthPayload.femalePiglets < 0
-        ) {
+        if (entry.startDate && !Validators.date.test(entry.startDate)) {
+          return ["sowReproductiveHistory.startDate: Fecha inválida."];
+        }
+
+        if (entry.boarId && !Validators.isValidUUID(entry.boarId)) {
           return [
-            "birth.femalePiglets: Número de lechones hembras inválido o faltante.",
+            "sowReproductiveHistory.boarId: ID del cerdo reproductor inválido.",
           ];
         }
 
-        if (
-          (birthPayload.deadPiglets &&
-            typeof birthPayload.deadPiglets !== "number") ||
-          birthPayload.deadPiglets < 0
-        ) {
-          return [
-            "birth.deadPiglets: Número de lechones muertos inválido o faltante.",
-          ];
-        }
+        if (entry.birthPayload) {
+          const b = entry.birthPayload;
 
-        if (
-          (birthPayload.averageLitterWeight &&
-            typeof birthPayload.averageLitterWeight !== "number") ||
-          birthPayload.averageLitterWeight < 0
-        ) {
-          return [
-            "birth.averageLitterWeight: Peso promedio inválido o faltante.",
-          ];
+          if (
+            b.malePiglets !== undefined &&
+            (typeof b.malePiglets !== "number" || b.malePiglets < 0)
+          ) {
+            return ["birth.malePiglets: Número de lechones machos inválido."];
+          }
+
+          if (
+            b.femalePiglets !== undefined &&
+            (typeof b.femalePiglets !== "number" || b.femalePiglets < 0)
+          ) {
+            return [
+              "birth.femalePiglets: Número de lechones hembras inválido.",
+            ];
+          }
+
+          if (
+            b.deadPiglets !== undefined &&
+            (typeof b.deadPiglets !== "number" || b.deadPiglets < 0)
+          ) {
+            return ["birth.deadPiglets: Número de lechones muertos inválido."];
+          }
+
+          if (
+            b.averageLitterWeight !== undefined &&
+            (typeof b.averageLitterWeight !== "number" ||
+              b.averageLitterWeight < 0)
+          ) {
+            return ["birth.averageLitterWeight: Peso promedio inválido."];
+          }
+
+          if (b.birthDate && !Validators.date.test(b.birthDate)) {
+            return ["birth.birthDate: Fecha de nacimiento inválida."];
+          }
+
+          if (b.description && typeof b.description !== "string") {
+            return ["birth.description: Descripción debe ser texto."];
+          }
         }
       }
     }
@@ -244,7 +238,7 @@ export class UpdatePigDto {
         body.initialPrice,
         body.weights,
         body.pigProducts,
-        body.sowReproductiveHistoryPayload
+        body.sowReproductiveHistory
       ),
     ];
   }

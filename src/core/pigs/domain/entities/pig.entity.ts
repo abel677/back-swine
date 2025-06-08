@@ -147,6 +147,11 @@ export class Pig {
   private updateTimestamp() {
     this.props.updatedAt = DomainDateTime.now();
   }
+  cannotAssignBoar(): boolean {
+    return [PigPhase.Neonatal, PigPhase.Weaning, PigPhase.Starter].includes(
+      this.props.phase.name as PigPhase
+    );
+  }
 
   cannotAssignReproductiveState(): boolean {
     const forbiddenPhases: PigPhase[] = [
@@ -165,6 +170,7 @@ export class Pig {
   ) {
     this.props.currentSowReproductiveHistory = currentSowReproductiveHistory;
   }
+
   saveSowReproductiveHistory(sowReproductiveHistory: ReproductiveHistory) {
     if (!this.isSow()) {
       throw ApiError.badRequest(

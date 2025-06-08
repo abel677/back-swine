@@ -62,6 +62,10 @@ export class Birth {
     });
   }
 
+  saveNumberBirth(numberBirth: number) {
+    this.props.numberBirth = numberBirth;
+  }
+
   savePiglet(pig: Pig) {
     const index = this.props.piglets.findIndex(
       (piglet) => piglet.id === pig.id

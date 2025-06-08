@@ -11,11 +11,11 @@ export class CreatePigDto {
     public readonly code: string,
     public readonly ageDays: number,
     public readonly initialPrice: number,
-    public readonly sowReproductiveHistoryPayload?: {
+    public readonly sowReproductiveHistory?: {
       reproductiveStateId: string;
       startDate: string;
       boarId?: string;
-      birthPayload?: {
+      birth?: {
         malePiglets: number;
         femalePiglets: number;
         deadPiglets: number;
@@ -23,11 +23,10 @@ export class CreatePigDto {
         birthDate: string;
         description?: string;
       };
-    }
+    }[]
   ) {}
 
   static create(body: { [key: string]: any }): [string?, CreatePigDto?] {
-    // Validaciones generales
     if (!Validators.isValidUUID(body.farmId)) {
       return ["farmId: ID de granja inválido o faltante."];
     }
@@ -79,59 +78,64 @@ export class CreatePigDto {
       return ["initialPrice: Precio inicial inválido o faltante."];
     }
 
-    // Validaciones de historial reproductivo (si aplica)
+    // Validaciones del historial reproductivo
     if (body.sowReproductiveHistoryPayload) {
-      const { reproductiveStateId, startDate, boarId, birthPayload } =
-        body.sowReproductiveHistoryPayload;
-
-      if (
-        !reproductiveStateId ||
-        !Validators.isValidUUID(reproductiveStateId)
-      ) {
-        return [
-          "sowReproductiveHistory.reproductiveStateId: ID estado reproductivo inválido o faltante.",
-        ];
+      if (!Array.isArray(body.sowReproductiveHistoryPayload)) {
+        return ["sowReproductiveHistory: Debe ser un arreglo válido."];
       }
 
-      if (!Validators.date.test(startDate)) {
-        return ["sowReproductiveHistory.startDate: Fecha inválida o faltante."];
-      }
-
-      if (boarId && !Validators.isValidUUID(boarId)) {
-        return [
-          "sowReproductiveHistory.boarId: ID del cerdo reproductor inválido o faltante.",
-        ];
-      }
-
-      if (birthPayload) {
-        const { malePiglets, femalePiglets, deadPiglets, averageLitterWeight } =
-          birthPayload;
-
-        if (typeof malePiglets !== "number" || malePiglets < 0) {
-          return [
-            "birth.malePiglets: Número de lechones machos inválido o faltante.",
-          ];
-        }
-
-        if (typeof femalePiglets !== "number" || femalePiglets < 0) {
-          return [
-            "birth.femalePiglets: Número de lechones hembras inválido o faltante.",
-          ];
-        }
-
-        if (typeof deadPiglets !== "number" || deadPiglets < 0) {
-          return [
-            "birth.deadPiglets: Número de lechones muertos inválido o faltante.",
-          ];
-        }
+      for (let i = 0; i < body.sowReproductiveHistoryPayload.length; i++) {
+        const entry = body.sowReproductiveHistoryPayload[i];
+        const prefix = `sowReproductiveHistory[${i}]`;
 
         if (
-          typeof averageLitterWeight !== "number" ||
-          averageLitterWeight < 0
+          !entry.reproductiveStateId ||
+          !Validators.isValidUUID(entry.reproductiveStateId)
         ) {
-          return [
-            "birth.averageLitterWeight: Peso promedio inválido o faltante.",
-          ];
+          return [`${prefix}.reproductiveStateId: ID inválido o faltante.`];
+        }
+
+        if (!Validators.date.test(entry.startDate)) {
+          return [`${prefix}.startDate: Fecha inválida o faltante.`];
+        }
+
+        if (entry.boarId && !Validators.isValidUUID(entry.boarId)) {
+          return [`${prefix}.boarId: ID del cerdo reproductor inválido.`];
+        }
+
+        if (entry.birthPayload) {
+          const {
+            malePiglets,
+            femalePiglets,
+            deadPiglets,
+            averageLitterWeight,
+            birthDate,
+          } = entry.birthPayload;
+
+          if (typeof malePiglets !== "number" || malePiglets < 0) {
+            return [`${prefix}.birthPayload.malePiglets: Número inválido.`];
+          }
+
+          if (typeof femalePiglets !== "number" || femalePiglets < 0) {
+            return [`${prefix}.birthPayload.femalePiglets: Número inválido.`];
+          }
+
+          if (typeof deadPiglets !== "number" || deadPiglets < 0) {
+            return [`${prefix}.birthPayload.deadPiglets: Número inválido.`];
+          }
+
+          if (
+            typeof averageLitterWeight !== "number" ||
+            averageLitterWeight < 0
+          ) {
+            return [
+              `${prefix}.birthPayload.averageLitterWeight: Peso inválido.`,
+            ];
+          }
+
+          if (!Validators.date.test(birthDate)) {
+            return [`${prefix}.birthPayload.birthDate: Fecha inválida.`];
+          }
         }
       }
     }
@@ -147,7 +151,7 @@ export class CreatePigDto {
         body.code,
         body.ageDays,
         body.initialPrice,
-        body.sowReproductiveHistoryPayload
+        body.sowReproductiveHistory
       ),
     ];
   }

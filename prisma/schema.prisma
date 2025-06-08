@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Plan {
-  id              String     @unique @default(uuid())
+  id              String     @id @default(uuid())
   name            String
   maxFarms        Int
   maxUsersPerFarm Int
@@ -17,7 +17,7 @@ model Plan {
 }
 
 model User {
-  id                String     @unique @default(uuid())
+  id                String     @id @default(uuid())
   email             String     @unique
   password          String
   isOwner           Boolean
@@ -32,7 +32,7 @@ model User {
 }
 
 model UserPlan {
-  id     String @unique @default(uuid())
+  id     String @id @default(uuid())
   userId String @unique
   planId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -40,7 +40,7 @@ model UserPlan {
 }
 
 model FarmUser {
-  id     String @unique @default(uuid())
+  id     String @id @default(uuid())
   farmId String
   userId String
   farm   Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
@@ -48,7 +48,7 @@ model FarmUser {
 }
 
 model Notification {
-  id          String   @unique @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   description String   @db.LongText
   data        String
@@ -59,7 +59,7 @@ model Notification {
 }
 
 model Farm {
-  id                 String              @unique @default(uuid())
+  id                 String              @id @default(uuid())
   name               String
   ownerId            String
   owner              User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -78,7 +78,7 @@ model Farm {
 }
 
 model Breed {
-  id        String   @unique @default(uuid())
+  id        String   @id @default(uuid())
   name      String
   farmId    String
   farm      Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
@@ -99,7 +99,7 @@ model ReproductiveState {
 }
 
 model Phase {
-  id        String   @unique @default(uuid())
+  id        String   @id @default(uuid())
   name      String
   farmId    String
   order     Int
@@ -120,7 +120,7 @@ model Category {
 }
 
 model Product {
-  id          String       @unique @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   description String?      @db.LongText
   price       Decimal      @db.Decimal(10, 3)
@@ -150,7 +150,7 @@ enum PigType {
 }
 
 model Pig {
-  id      String @unique @default(uuid())
+  id      String @id @default(uuid())
   farmId  String
   breedId String
   phaseId String
@@ -189,7 +189,7 @@ model Pig {
 }
 
 model ReproductiveHistory {
-  id                  String   @unique @default(uuid())
+  id                  String   @id @default(uuid())
   reproductiveStateId String
   sowId               String
   boarId              String?
@@ -204,7 +204,7 @@ model ReproductiveHistory {
 }
 
 model Birth {
-  id                    String   @unique @default(uuid())
+  id                    String   @id @default(uuid())
   reproductiveHistoryId String   @unique
   numberBirth           Int
   birthDate             DateTime
@@ -215,14 +215,14 @@ model Birth {
   isLitterWeaned        Boolean  @default(false)
   createdAt             DateTime
   updatedAt             DateTime
-  description           String?   @db.LongText
+  description           String?  @db.LongText
 
   piglets             Pig[]               @relation("BirthPiglets")
   reproductiveHistory ReproductiveHistory @relation("ReproductiveHistoryBirth", fields: [reproductiveHistoryId], references: [id], onDelete: Cascade)
 }
 
 model PigWeight {
-  id        String   @unique @default(uuid())
+  id        String   @id @default(uuid())
   pigId     String
   days      Int
   weight    Decimal  @db.Decimal(10, 3)
@@ -233,7 +233,7 @@ model PigWeight {
 }
 
 model PigProduct {
-  id        String  @unique @default(uuid())
+  id        String  @id @default(uuid())
   pigId     String
   productId String
   quantity  Decimal @db.Decimal(10, 3)
