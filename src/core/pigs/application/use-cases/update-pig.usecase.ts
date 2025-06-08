@@ -7,7 +7,6 @@ import { SettingRepository } from "../../../farms/domain/contracts/setting.repos
 import { CreateSowNotificationsUseCase } from "../../../notifications/application/use-cases/create-sow-notification.usecase";
 import { DeleteSowNotificationUseCase } from "../../../notifications/application/use-cases/delete-sow-notification.usecase";
 import { ProductRepository } from "../../../products/domain/contracts/product.repository";
-import { ALLOWED_TRANSITIONS } from "../../../shared/domain/allowed-transition";
 import {
   PigPhase,
   PigReproductiveState,
@@ -314,7 +313,9 @@ export class UpdatePigUseCase {
                   farm: pig.farm,
                   breed: pigletBreed,
                   phase: phasePiglet,
-                  code: `P${sex === PigSex.Female ? "H" : "M"}P-${Date.now()}`,
+                  code: `P${sex === PigSex.Female ? "H" : "M"}P-${crypto
+                    .randomUUID()
+                    .slice(0, 4)}`,
                   ageDays: 0,
                   initialPrice: setting.initialPigletPrice,
                   type: PigType.Production,

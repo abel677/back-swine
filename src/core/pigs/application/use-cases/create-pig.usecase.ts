@@ -214,7 +214,9 @@ export class CreatePigUseCase {
                 farm: newPig.farm,
                 breed: pigletBreed,
                 phase: phasePiglet,
-                code: `P${sex === PigSex.Female ? "H" : "M"}P-${Date.now()}`,
+                code: `P${sex === PigSex.Female ? "H" : "M"}P-${crypto
+                  .randomUUID()
+                  .slice(0, 4)}`,
                 ageDays: 0,
                 initialPrice: setting.initialPigletPrice,
                 type: PigType.Production,
